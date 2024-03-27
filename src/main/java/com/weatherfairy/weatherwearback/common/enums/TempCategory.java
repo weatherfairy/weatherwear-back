@@ -1,4 +1,4 @@
-package com.weatherfairy.weatherwearback.clothes.entity.enums;
+package com.weatherfairy.weatherwearback.common.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

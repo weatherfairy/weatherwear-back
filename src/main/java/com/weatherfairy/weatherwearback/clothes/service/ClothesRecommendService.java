@@ -1,8 +1,8 @@
 package com.weatherfairy.weatherwearback.clothes.service;
 
 import com.weatherfairy.weatherwearback.clothes.entity.Clothes;
-import com.weatherfairy.weatherwearback.clothes.entity.enums.ClothesCategory;
-import com.weatherfairy.weatherwearback.clothes.entity.enums.TempCategory;
+import com.weatherfairy.weatherwearback.common.enums.ClothesCategory;
+import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.clothes.repository.ClothesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

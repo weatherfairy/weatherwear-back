@@ -1,11 +1,14 @@
 package com.weatherfairy.weatherwearback.post.entity;
 
+import com.weatherfairy.weatherwearback.common.enums.Emoji;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -18,16 +21,19 @@ public class Post {
     private Long postId;
 
     @Column(nullable = false)
-    private Long memberId;
+    private Long memberNo;
 
     @Column(nullable = false)
-    private Date date;
-
-    @Column(nullable = false)
-    private String location;
+    private LocalDate date;
 
     @Column
-    private Date updateDate;
+    private float minTemp;
+
+    @Column
+    private float maxTemp;
+
+    @Column
+    private SkyCategory sky;
 
     @Column
     private String image1;
@@ -45,5 +51,20 @@ public class Post {
     private String review;
 
     @Column
-    private Integer emoji;
+    private Emoji emoji;
+
+    @Builder
+    public Post(Long memberNo, LocalDate date, float minTemp, float maxTemp, SkyCategory sky, String image1, String image2, String image3, String clothes, String review, Emoji emoji) {
+        this.memberNo = memberNo;
+        this.date = date;
+        this.minTemp = minTemp;
+        this.maxTemp = maxTemp;
+        this.sky = sky;
+        this.image1 = image1;
+        this.image2 = image2;
+        this.image3 = image3;
+        this.clothes = clothes;
+        this.review = review;
+        this.emoji = emoji;
+    }
 }
