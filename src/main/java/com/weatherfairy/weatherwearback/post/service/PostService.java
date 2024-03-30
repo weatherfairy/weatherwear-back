@@ -1,19 +1,20 @@
 package com.weatherfairy.weatherwearback.post.service;
 
+import com.weatherfairy.weatherwearback.common.current.GetCurrentData;
+import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
+import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostsResponse;
-import com.weatherfairy.weatherwearback.post.dto.response.GetRecommendResponse;
+import com.weatherfairy.weatherwearback.post.dto.response.GetPostResponse;
 import com.weatherfairy.weatherwearback.post.entity.Post;
 import com.weatherfairy.weatherwearback.post.repository.PostRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,7 +22,9 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final GetCurrentData getCurrentData;
 
+    @Transactional(readOnly = true)
     public Page<GetPostsResponse> getPostsScroll(Pageable pageable, Long memberNo) {
 
         Page<Post> postsList = postRepository.findAllByMemberNo(memberNo, pageable);
@@ -30,68 +33,31 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetPostsResponse> getFilteredPosts(Map<String, Object> filters) {
+    public GetPostResponse getPost(Long postNo) {
 
-        List<Post> postsList = postRepository.findAll();
-        return postsList.stream()
-                .map(GetPostsResponse::from)
-                .collect(Collectors.toList());
+        Post post = postRepository.findById(postNo)
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+
+        return new GetPostResponse(post.getPostId(), post.getImage1(), post.getImage2(), post.getImage3(),
+                post.getDate(), post.getWeatherDataVO().getMinTemp(), post.getWeatherDataVO().getMaxTemp(), post.getClothes(),
+                post.getReview(), post.getEmoji().getValue(), post.getWeatherDataVO().getSky().getValue());
     }
 
     @Transactional(readOnly = true)
-    public List<GetRecommendResponse> getRecommendedPosts(Long memberNo) {
+    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
 
-        List<GetRecommendResponse> dummyData = new ArrayList<>();
+        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
+        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
 
-        // 첫 번째 더미 데이터 생성
-        GetRecommendResponse dummyResponse1 = new GetRecommendResponse(
-                1L, // postNo
-                "https://picsum.photos/200/300",
-                "https://picsum.photos/200/300",
-                "https://picsum.photos/200/300",
-                LocalDate.now(),
-                10.0f,
-                20.0f,
-                "Dummy clothes text 1",
-                "Dummy review 1",
-                0,
-                0
-        );
-        dummyData.add(dummyResponse1);
+        System.out.println("tempCategory = " + tempCategory);
+        System.out.println("skyCategory = " + skyCategory);
 
-        // 두 번째 더미 데이터 생성
-        GetRecommendResponse dummyResponse2 = new GetRecommendResponse(
-                2L, // postNo
-                "https://picsum.photos/200/300",
-                "https://picsum.photos/200/300",
-                "https://picsum.photos/200/300",
-                LocalDate.now(),
-                11.0f,
-                21.0f,
-                "Dummy clothes text 2",
-                "Dummy review 2",
-                1,
-                1
-        );
-        dummyData.add(dummyResponse2);
+        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
 
-        // 세 번째 더미 데이터 생성
-        GetRecommendResponse dummyResponse3 = new GetRecommendResponse(
-                3L,
-                "https://picsum.photos/200/300",
-                "https://picsum.photos/200/300",
-                "https://picsum.photos/200/300",
-                LocalDate.now(),
-                12.0f,
-                22.0f,
-                "Dummy clothes text 3",
-                "Dummy review 3",
-                2,
-                2
-        );
-        dummyData.add(dummyResponse3);
-
-        return dummyData;
-
+        return posts.stream()
+                .map(GetPostResponse::from)
+                .collect(Collectors.toList());
     }
+
+
 }

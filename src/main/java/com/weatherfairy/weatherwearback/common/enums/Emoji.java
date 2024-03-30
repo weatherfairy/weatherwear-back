@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum Emoji {
-    HAPPY(0), NEUTRAL(1), UNHAPPY(2);
+    HAPPY(1), NEUTRAL(2), UNHAPPY(3);
 
     private final int value;
 
