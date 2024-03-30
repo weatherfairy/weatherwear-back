@@ -6,7 +6,9 @@ import java.time.LocalDate;
 
 public record GetRecommendResponse(
         Long postNo,
-        String imageUrl,
+        String image1,
+        String image2,
+        String image3,
         LocalDate postDate,
         float minTemp,
         float maxTemp,
@@ -17,7 +19,7 @@ public record GetRecommendResponse(
 
 ) {
     public static GetRecommendResponse from(Post post) {
-        return new GetRecommendResponse(post.getPostId(), post.getImage1(), post.getDate(), post.getMinTemp(), post.getMaxTemp(), post.getClothes(), post.getReview(),
+        return new GetRecommendResponse(post.getPostId(), post.getImage1(), post.getImage2(), post.getImage3(),post.getDate(), post.getMinTemp(), post.getMaxTemp(), post.getClothes(), post.getReview(),
                 post.getEmoji().getValue(), post.getSky().getValue());
     }
 }

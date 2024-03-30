@@ -3,7 +3,6 @@ package com.weatherfairy.weatherwearback.post.service;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostsResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetRecommendResponse;
 import com.weatherfairy.weatherwearback.post.entity.Post;
-import com.weatherfairy.weatherwearback.post.repository.PostMapper;
 import com.weatherfairy.weatherwearback.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final PostMapper postMapper;
 
     public Page<GetPostsResponse> getPostsScroll(Pageable pageable, Long memberNo) {
 
@@ -34,7 +32,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<GetPostsResponse> getFilteredPosts(Map<String, Object> filters) {
 
-        List<Post> postsList = postMapper.getFilteredPosts(filters);
+        List<Post> postsList = postRepository.findAll();
         return postsList.stream()
                 .map(GetPostsResponse::from)
                 .collect(Collectors.toList());
@@ -48,7 +46,9 @@ public class PostService {
         // 첫 번째 더미 데이터 생성
         GetRecommendResponse dummyResponse1 = new GetRecommendResponse(
                 1L, // postNo
-                "https://example.com/image1.jpg",
+                "https://picsum.photos/200/300",
+                "https://picsum.photos/200/300",
+                "https://picsum.photos/200/300",
                 LocalDate.now(),
                 10.0f,
                 20.0f,
@@ -62,7 +62,9 @@ public class PostService {
         // 두 번째 더미 데이터 생성
         GetRecommendResponse dummyResponse2 = new GetRecommendResponse(
                 2L, // postNo
-                "https://example.com/image2.jpg",
+                "https://picsum.photos/200/300",
+                "https://picsum.photos/200/300",
+                "https://picsum.photos/200/300",
                 LocalDate.now(),
                 11.0f,
                 21.0f,
@@ -76,7 +78,9 @@ public class PostService {
         // 세 번째 더미 데이터 생성
         GetRecommendResponse dummyResponse3 = new GetRecommendResponse(
                 3L,
-                "https://example.com/image3.jpg",
+                "https://picsum.photos/200/300",
+                "https://picsum.photos/200/300",
+                "https://picsum.photos/200/300",
                 LocalDate.now(),
                 12.0f,
                 22.0f,
