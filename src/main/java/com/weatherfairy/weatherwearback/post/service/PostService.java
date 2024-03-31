@@ -49,9 +49,6 @@ public class PostService {
         TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
         int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
 
-        System.out.println("tempCategory = " + tempCategory);
-        System.out.println("skyCategory = " + skyCategory);
-
         List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
 
         return posts.stream()

@@ -33,6 +33,7 @@ public class IntListConverter implements AttributeConverter<List<Integer>, Strin
             try {
                 intList.add(Integer.parseInt(part.trim()));
             } catch (NumberFormatException e) {
+                System.out.println("e = " + e);
             }
         }
         return intList;

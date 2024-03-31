@@ -30,10 +30,9 @@ public class FloatListConverter implements AttributeConverter<List<Float>, Strin
         List<Float> floatList = new ArrayList<>();
         for (String part : parts) {
             try {
-                floatList.add(Float.parseFloat(part.trim())); // Trim any leading/trailing spaces
+                floatList.add(Float.parseFloat(part.trim()));
             } catch (NumberFormatException e) {
-                // Handle invalid float values gracefully
-                // You may log a warning or take other appropriate action here
+                System.out.println("e = " + e);
             }
         }
         return floatList;

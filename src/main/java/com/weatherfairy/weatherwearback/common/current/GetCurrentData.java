@@ -1,6 +1,5 @@
 package com.weatherfairy.weatherwearback.common.current;
 
-import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
 import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.today.entity.Today;
 import com.weatherfairy.weatherwearback.today.repository.TodayRepository;
