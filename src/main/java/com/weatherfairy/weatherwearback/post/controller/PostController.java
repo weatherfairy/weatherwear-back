@@ -1,5 +1,7 @@
 package com.weatherfairy.weatherwearback.post.controller;
 
+import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
+import com.weatherfairy.weatherwearback.post.dto.response.CreatePostResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostsResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostResponse;
 import com.weatherfairy.weatherwearback.post.service.PostService;
@@ -7,11 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,17 +22,35 @@ public class PostController {
 
     private final PostService postService;
 
-    @GetMapping("/api/v1/closet/lists")
-    public ResponseEntity<Page<GetPostsResponse>> getAllPosts(@RequestBody Map<String, Object> filters) {
+//    @GetMapping("/api/v1/closet/lists")
+//    public ResponseEntity<Page<GetPostsResponse>> getAllPosts(@RequestBody Map<String, Object> filters) {
+//
+//        Long memberNo = 1L;
+//
+//        Pageable pageable = PageRequest.of((Integer) filters.get("page"), (Integer) filters.get("size"));
+//
+//        Page<GetPostsResponse> response = postService.getPostsScroll(pageable, memberNo);
+//
+//        return ResponseEntity.ok(response);
+//    }
+
+    @PostMapping("/api/v1/closet/lists")
+    public ResponseEntity<Page<GetPostsResponse>> getAllPosts(@RequestParam Integer page,
+                                                              @RequestParam Integer size,
+                                                              @RequestParam(required = false) List<Integer> month,
+                                                              @RequestParam(required = false) Integer min,
+                                                              @RequestParam(required = false) Integer max,
+                                                              @RequestParam(required = false) Integer emoji) {
 
         Long memberNo = 1L;
 
-        Pageable pageable = PageRequest.of((Integer) filters.get("page"), (Integer) filters.get("size"));
+        Pageable pageable = PageRequest.of(page, size);
 
         Page<GetPostsResponse> response = postService.getPostsScroll(pageable, memberNo);
 
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/api/v1/closet/lists/{postNo}")
     public ResponseEntity<GetPostResponse> getPost1(@PathVariable Long postNo) {
@@ -46,6 +67,30 @@ public class PostController {
         List<GetPostResponse> recommendedPosts = postService.getRecommendedPosts(memberNo, locationName);
 
         return ResponseEntity.ok(recommendedPosts);
+    }
+
+    @PostMapping("/api/v1/closet")
+    public ResponseEntity<CreatePostResponse> createPost(@RequestPart("request") CreatePostRequest request,
+                                                         @RequestPart("image1") MultipartFile image1,
+                                                         @RequestPart("image2") MultipartFile image2,
+                                                         @RequestPart("image3") MultipartFile image3) {
+
+        CreatePostResponse response = postService.createPost(image1,image2,image3, request);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @PostMapping("/api/v1/closet/{postNo}")
+    public ResponseEntity<String> deletePost(@PathVariable("postNo") Long postNo) {
+
+        Boolean response = postService.deletePost(postNo);
+
+        if (Boolean.TRUE.equals(response)) return ResponseEntity.ok("SUCCESS");
+        else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERROR");
+        }
+
     }
 
 
