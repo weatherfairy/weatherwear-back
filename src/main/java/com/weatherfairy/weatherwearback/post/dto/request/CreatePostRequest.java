@@ -1,15 +1,13 @@
 package com.weatherfairy.weatherwearback.post.dto.request;
 
-import com.weatherfairy.weatherwearback.common.enums.Emoji;
-import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
 
 public record CreatePostRequest(
-        float minTemp,
-        float maxTemp,
-        String clothesText,
+        float min,
+        float max,
+        String clothes,
         String review,
-        Emoji emoji,
-        SkyCategory sky
+        Integer emoji,
+        Integer sky
 
 ) {
 

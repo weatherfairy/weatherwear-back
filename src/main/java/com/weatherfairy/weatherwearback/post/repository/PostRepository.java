@@ -13,7 +13,8 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    Page<Post> findAllByMemberNo(Long memberNo, Pageable pageable);
+//    Page<Post> findAllByMemberNo(Long memberNo, Pageable pageable);
+    List<Post> findAllByMemberNo(Long memberNo);
 
     @Query("SELECT p FROM Post p WHERE p.weatherDataVO.sky = :skyCategory " +
             "AND p.weatherDataVO.tempCategory = :tempCategory " +

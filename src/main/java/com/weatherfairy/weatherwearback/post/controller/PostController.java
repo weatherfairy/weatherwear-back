@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -34,26 +35,36 @@ public class PostController {
 //        return ResponseEntity.ok(response);
 //    }
 
-    @PostMapping("/api/v1/closet/lists")
-    public ResponseEntity<Page<GetPostsResponse>> getAllPosts(@RequestParam Integer page,
-                                                              @RequestParam Integer size,
+    @GetMapping("/api/v1/closet/lists")
+    public ResponseEntity<List<GetPostsResponse>> getAllPosts(
+//                                                            @RequestParam Integer page,
+//                                                            @RequestParam Integer size,
                                                               @RequestParam(required = false) List<Integer> month,
                                                               @RequestParam(required = false) Integer min,
                                                               @RequestParam(required = false) Integer max,
-                                                              @RequestParam(required = false) Integer emoji) {
+                                                              @RequestParam(required = false) Integer emoji,
+                                                              @RequestParam(required = false) List<Integer> sky) {
 
         Long memberNo = 1L;
 
-        Pageable pageable = PageRequest.of(page, size);
+//        Pageable pageable = PageRequest.of(page, size);
 
-        Page<GetPostsResponse> response = postService.getPostsScroll(pageable, memberNo);
+//        Page<GetPostsResponse> response = postService.getPostsScroll(pageable, memberNo);
+        List<GetPostsResponse> response = postService.getAllPosts(memberNo);
+
+//        List<String> tempString = new ArrayList<>();
+//        tempString.add("month"+month.toString());
+//        tempString.add("min"+min.toString());
+//        tempString.add("max"+max.toString());
+//        tempString.add("emoji"+emoji.toString());
+//        tempString.add("sky"+sky.toString());
 
         return ResponseEntity.ok(response);
     }
 
 
     @GetMapping("/api/v1/closet/lists/{postNo}")
-    public ResponseEntity<GetPostResponse> getPost1(@PathVariable Long postNo) {
+    public ResponseEntity<GetPostResponse> getPost(@PathVariable Long postNo) {
 
         GetPostResponse response = postService.getPost(postNo);
 
@@ -70,15 +81,24 @@ public class PostController {
     }
 
     @PostMapping("/api/v1/closet")
-    public ResponseEntity<CreatePostResponse> createPost(@RequestPart("request") CreatePostRequest request,
-                                                         @RequestPart("image1") MultipartFile image1,
-                                                         @RequestPart("image2") MultipartFile image2,
-                                                         @RequestPart("image3") MultipartFile image3) {
+    public ResponseEntity<CreatePostResponse> createPost(
+            @RequestPart(value = "image1", required = false) MultipartFile image1,
+            @RequestPart(value = "image2", required = false) MultipartFile image2,
+            @RequestPart(value = "image3", required = false) MultipartFile image3,
+            @RequestPart("min") String minTemp,
+            @RequestPart("max") String maxTemp,
+            @RequestPart("clothes") String clothesText,
+            @RequestPart("review") String review,
+            @RequestPart("emoji") String emoji,
+            @RequestPart("sky") String sky
+    ) {
+
+        CreatePostRequest request = new CreatePostRequest( Float.parseFloat(minTemp), Float.parseFloat(maxTemp),
+                clothesText, review, Integer.parseInt(emoji), Integer.parseInt(sky));
 
         CreatePostResponse response = postService.createPost(image1,image2,image3, request);
 
         return ResponseEntity.ok(response);
-
     }
 
     @PostMapping("/api/v1/closet/{postNo}")

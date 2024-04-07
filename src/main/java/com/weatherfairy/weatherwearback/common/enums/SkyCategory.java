@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum SkyCategory {
 
-    SUNNY(1), OVERCAST(2), CLOUDY(3), SLEET(4), RAIN(5), SNOW(6), WINDY(7);
+    SUNNY(0), OVERCAST(1), CLOUDY(2), SLEET(3), RAIN(4), SNOW(5), WINDY(6);
 
     private final int value;
 

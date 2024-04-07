@@ -1,6 +1,7 @@
 package com.weatherfairy.weatherwearback.post.service;
 
 import com.weatherfairy.weatherwearback.common.current.GetCurrentData;
+import com.weatherfairy.weatherwearback.common.enums.Emoji;
 import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
 import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
@@ -12,8 +13,6 @@ import com.weatherfairy.weatherwearback.post.entity.vo.WeatherDataVO;
 import com.weatherfairy.weatherwearback.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -63,13 +62,13 @@ public class PostService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public Page<GetPostsResponse> getPostsScroll(Pageable pageable, Long memberNo) {
-
-        Page<Post> postsList = postRepository.findAllByMemberNo(memberNo, pageable);
-
-        return postsList.map(GetPostsResponse::from);
-    }
+//    @Transactional(readOnly = true)
+//    public Page<GetPostsResponse> getPostsScroll(Pageable pageable, Long memberNo) {
+//
+//        Page<Post> postsList = postRepository.findAllByMemberNo(memberNo, pageable);
+//
+//        return postsList.map(GetPostsResponse::from);
+//    }
 
     @Transactional(readOnly = true)
     public GetPostResponse getPost(Long postNo) {
@@ -106,17 +105,17 @@ public class PostService {
         String image3Url = saveImage(image3);
 
         WeatherDataVO weatherDataVO = WeatherDataVO.builder()
-                .sky(request.sky())
-                .maxTemp(request.maxTemp())
-                .minTemp(request.minTemp())
+                .sky(SkyCategory.SNOW)
+                .maxTemp(request.max())
+                .minTemp(request.min())
                 .build();
 
         Post post = postRepository.save(Post.builder()
                 .memberNo(1L)
                 .date(LocalDate.now())
-                .clothes(request.clothesText())
+                .clothes(request.clothes())
                 .review(request.review())
-                .emoji(request.emoji())
+                .emoji(Emoji.HAPPY)
                 .weatherDataVO(weatherDataVO)
                 .image1(image1Url)
                 .image2(image2Url)
@@ -138,5 +137,16 @@ public class PostService {
         } catch (EntityNotFoundException e) {
             return false;
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetPostsResponse> getAllPosts(Long memberNo) {
+
+        List<Post> postsList = postRepository.findAllByMemberNo(memberNo);
+
+        return postsList.stream()
+                .map(GetPostsResponse::from)
+                .collect(Collectors.toList());
+
     }
 }

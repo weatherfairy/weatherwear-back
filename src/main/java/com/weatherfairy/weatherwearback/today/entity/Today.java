@@ -2,6 +2,7 @@ package com.weatherfairy.weatherwearback.today.entity;
 
 import com.weatherfairy.weatherwearback.common.converter.FloatListConverter;
 import com.weatherfairy.weatherwearback.common.converter.IntListConverter;
+import com.weatherfairy.weatherwearback.common.converter.StringListConverter;
 import com.weatherfairy.weatherwearback.common.enums.ClothesCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -35,12 +36,6 @@ public class Today {
     private int locationY;
 
     @Column
-    private int top;
-
-    @Column
-    private int bottom;
-
-    @Column
     private float minTemp;
 
     @Column
@@ -59,13 +54,14 @@ public class Today {
     private List<Integer> skyCategory;
 
     @Column
-    @Convert(converter = FloatListConverter.class)
-    private List<Float> rain;
+    @Convert(converter = StringListConverter.class)
+    private List<String> rain;
 
     @Builder
-    public Today(int top, int bottom, float minTemp, float maxTemp, List<Float> temperature, List<Float> feelsLike, List<Integer> skyCategory, List<Float> rain) {
-        this.top = top;
-        this.bottom = bottom;
+    public Today(String locationName, int locationX, int locationY, float minTemp, float maxTemp, List<Float> temperature, List<Float> feelsLike, List<Integer> skyCategory, List<String> rain) {
+        this.locationName = locationName;
+        this.locationX = locationX;
+        this.locationY = locationY;
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;
         this.temperature = temperature;
