@@ -9,7 +9,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -22,9 +21,11 @@ public class Scheduler {
     private final WeatherAPIService weatherAPIService;
     private final ParseWeatherData parseWeatherData;
 
-//    @Scheduled(cron = )
-    public void saveYesterdayData(Today today, Yesterday yesterday) {
-        BeanUtils.copyProperties(yesterday, today);
+    @Scheduled(cron = "0 30 22 * * *")
+    public void saveYesterdayData() throws ParseException, IOException {
+        LocalDate date = LocalDate.now().plusDays(1);
+        JSONArray tomorrowJson = weatherAPIService.getWeatherData(date.toString().replace("-", ""));
+        parseWeatherData.saveYesterdayWeather(tomorrowJson);
 
 
     }
@@ -39,7 +40,7 @@ public class Scheduler {
    public void saveTomorrowData() throws ParseException, IOException{
         LocalDate date = LocalDate.now();
        JSONArray tomorrowJSON = weatherAPIService.getWeatherData(date.toString().replace("-", ""));
-       parseWeatherData.saveTodayWeather(tomorrowJSON);
+       parseWeatherData.saveTomorrowData(tomorrowJSON);
    }
 
 

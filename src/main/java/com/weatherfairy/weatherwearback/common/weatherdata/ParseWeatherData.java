@@ -4,6 +4,8 @@ import com.weatherfairy.weatherwearback.today.entity.Today;
 import com.weatherfairy.weatherwearback.today.repository.TodayRepository;
 import com.weatherfairy.weatherwearback.tomorrow.entity.Tomorrow;
 import com.weatherfairy.weatherwearback.tomorrow.repository.TomorrowRepository;
+import com.weatherfairy.weatherwearback.yesterday.entity.Yesterday;
+import com.weatherfairy.weatherwearback.yesterday.repository.YesterdayRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -17,6 +19,7 @@ public class ParseWeatherData {
 
     private final TodayRepository todayRepository;
     private final TomorrowRepository tomorrowRepository;
+    private final YesterdayRepository yesterdayRepository;
 
     public void saveTodayWeather(JSONArray weatherDataJSON) {
 
@@ -102,4 +105,45 @@ public class ParseWeatherData {
         tomorrowRepository.save(tomorrow);
     }
 
+    public void saveYesterdayWeather(JSONArray yesterdayJson) {
+        yesterdayRepository.deleteAllInBatch();
+
+        List<Float> tmpValues = new ArrayList<>();
+        List<String> pcpValues = new ArrayList<>();
+        List<Integer> skyValues = new ArrayList<>();
+        float maxTemp = 0;
+        float minTemp = 0;
+
+        for (Object obj : yesterdayJson) {
+            JSONObject dataJson = (JSONObject) obj;
+            String category = (String) dataJson.get("category");
+            String fcstValue = (String) dataJson.get("fcstValue");
+
+            if (category.equals("TMP")) {
+                tmpValues.add(Float.valueOf(fcstValue));
+            } else if (category.equals("PCP")) {
+                pcpValues.add(fcstValue);
+            } else if (category.equals("SKY")) {
+                skyValues.add(Integer.parseInt(fcstValue));
+            } else if (category.equals("TMX")) {
+                maxTemp = Float.parseFloat(fcstValue);
+            } else if (category.equals("TMN")) {
+                minTemp = Float.parseFloat(fcstValue);
+            }
+        }
+
+        Yesterday yesterday = Yesterday.builder()
+                .locationName("서울특별시 성북구")
+                .locationX(60)
+                .locationY(127)
+                .temperature(tmpValues)
+                .skyCategory(skyValues)
+                .rain(pcpValues)
+                .maxTemp(maxTemp)
+                .minTemp(minTemp)
+                .build();
+
+        yesterdayRepository.save(yesterday);
+
+    }
 }

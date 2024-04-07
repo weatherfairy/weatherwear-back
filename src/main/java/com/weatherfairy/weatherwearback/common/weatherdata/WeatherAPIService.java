@@ -1,6 +1,5 @@
 package com.weatherfairy.weatherwearback.common.weatherdata;
 
-import com.weatherfairy.weatherwearback.common.weatherdata.ParseWeatherData;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,14 +22,11 @@ public class WeatherAPIService {
     @Value("${weather.api-key}")
     private String serviceKey;
 
-    private final ParseWeatherData parseWeatherData;
-
     private final String url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
 
     public JSONArray getWeatherData(String baseDate) throws ParseException, IOException {
 
-        baseDate = "20240406";
-        int nx = 60;
+        int nx = 61;
         int ny = 127;
 
         StringBuilder urlBuilder = new StringBuilder(url);
