@@ -24,10 +24,7 @@ public class WeatherAPIService {
 
     private final String url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
 
-    public JSONArray getWeatherData(String baseDate) throws ParseException, IOException {
-
-        int nx = 61;
-        int ny = 127;
+    public JSONArray getWeatherData(String baseDate, int nx, int ny) throws ParseException, IOException {
 
         StringBuilder urlBuilder = new StringBuilder(url);
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + serviceKey);
@@ -40,6 +37,7 @@ public class WeatherAPIService {
         urlBuilder.append("&" + URLEncoder.encode("ny", "UTF-8") + "=" + URLEncoder.encode(String.valueOf(ny), "UTF-8"));
 
         URL url = new URL(urlBuilder.toString());
+        System.out.println("url = " + url);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");

@@ -27,14 +27,6 @@ public class Tomorrow {
     private String locationName;
 
     @Column
-    @Comment("x 좌표")
-    private int locationX;
-
-    @Column
-    @Comment("y 좌표")
-    private int locationY;
-
-    @Column
     private float minTemp;
 
     @Column
@@ -57,10 +49,8 @@ public class Tomorrow {
     private List<String> rain;
 
     @Builder
-    public Tomorrow(String locationName, int locationX, int locationY, float minTemp, float maxTemp, List<Float> temperature, List<Float> feelsLike, List<Integer> skyCategory, List<String> rain) {
+    public Tomorrow(String locationName, float minTemp, float maxTemp, List<Float> temperature, List<Float> feelsLike, List<Integer> skyCategory, List<String> rain) {
         this.locationName = locationName;
-        this.locationX = locationX;
-        this.locationY = locationY;
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;
         this.temperature = temperature;

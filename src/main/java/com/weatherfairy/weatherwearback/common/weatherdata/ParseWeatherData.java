@@ -17,13 +17,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ParseWeatherData {
 
-    private final TodayRepository todayRepository;
-    private final TomorrowRepository tomorrowRepository;
-    private final YesterdayRepository yesterdayRepository;
+        private final TodayRepository todayRepository;
+        private final TomorrowRepository tomorrowRepository;
+        private final YesterdayRepository yesterdayRepository;
 
-    public void saveTodayWeather(JSONArray weatherDataJSON) {
+        public void saveWeatherData(String locationName, JSONArray weatherDataJSON, int dataType) {
+            switch (dataType) {
+                case 1:
+                    saveTodayWeather(locationName, weatherDataJSON);
+                    break;
+                case 2:
+                    saveTomorrowData(locationName, weatherDataJSON);
+                    break;
+                case 3:
+                    saveYesterdayWeather(locationName, weatherDataJSON);
+                    break;
+                default:
+                    break;
+            }
+        }
 
-        todayRepository.deleteAllInBatch();
+    private void saveTodayWeather(String locationName, JSONArray weatherDataJSON) {
+
+//        todayRepository.deleteAllInBatch();
 
         List<Float> tmpValues = new ArrayList<>();
         List<String> pcpValues = new ArrayList<>();
@@ -50,9 +66,7 @@ public class ParseWeatherData {
         }
 
         Today today = Today.builder()
-                .locationName("서울특별시 성북구")
-                .locationX(60)
-                .locationY(127)
+                .locationName(locationName)
                 .temperature(tmpValues)
                 .skyCategory(skyValues)
                 .rain(pcpValues)
@@ -63,9 +77,9 @@ public class ParseWeatherData {
         todayRepository.save(today);
     }
 
-    public void saveTomorrowData(JSONArray weatherDataJSON) {
+    private void saveTomorrowData(String locationName, JSONArray weatherDataJSON) {
 
-        tomorrowRepository.deleteAllInBatch();
+//        tomorrowRepository.deleteAllInBatch();
 
         List<Float> tmpValues = new ArrayList<>();
         List<String> pcpValues = new ArrayList<>();
@@ -92,9 +106,7 @@ public class ParseWeatherData {
         }
 
         Tomorrow tomorrow = Tomorrow.builder()
-                .locationName("서울특별시 성북구")
-                .locationX(60)
-                .locationY(127)
+                .locationName(locationName)
                 .temperature(tmpValues)
                 .skyCategory(skyValues)
                 .rain(pcpValues)
@@ -105,8 +117,8 @@ public class ParseWeatherData {
         tomorrowRepository.save(tomorrow);
     }
 
-    public void saveYesterdayWeather(JSONArray yesterdayJson) {
-        yesterdayRepository.deleteAllInBatch();
+    private void saveYesterdayWeather(String locationName, JSONArray yesterdayJson) {
+//        yesterdayRepository.deleteAllInBatch();
 
         List<Float> tmpValues = new ArrayList<>();
         List<String> pcpValues = new ArrayList<>();
@@ -133,9 +145,7 @@ public class ParseWeatherData {
         }
 
         Yesterday yesterday = Yesterday.builder()
-                .locationName("서울특별시 성북구")
-                .locationX(60)
-                .locationY(127)
+                .locationName(locationName)
                 .temperature(tmpValues)
                 .skyCategory(skyValues)
                 .rain(pcpValues)

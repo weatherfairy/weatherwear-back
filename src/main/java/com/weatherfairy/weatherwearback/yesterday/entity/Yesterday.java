@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TBL_YESTERDAY")
-public class Yesterday {
+public class Yesterday{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,14 +25,6 @@ public class Yesterday {
     @Column
     @Comment("장소 이름")
     private String locationName;
-
-    @Column
-    @Comment("x 좌표")
-    private int locationX;
-
-    @Column
-    @Comment("y 좌표")
-    private int locationY;
 
     @Column
     private float minTemp;
@@ -57,10 +49,8 @@ public class Yesterday {
     private List<String> rain;
 
     @Builder
-    public Yesterday(String locationName, int locationX, int locationY, float minTemp, float maxTemp, List<Float> temperature, List<Float> feelsLike, List<Integer> skyCategory, List<String> rain) {
+    public Yesterday(String locationName, float minTemp, float maxTemp, List<Float> temperature, List<Float> feelsLike, List<Integer> skyCategory, List<String> rain) {
         this.locationName = locationName;
-        this.locationX = locationX;
-        this.locationY = locationY;
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;
         this.temperature = temperature;
@@ -68,4 +58,5 @@ public class Yesterday {
         this.skyCategory = skyCategory;
         this.rain = rain;
     }
+
 }
