@@ -1,5 +1,8 @@
 package com.weatherfairy.weatherwearback.clothes.entity;
 
+import com.weatherfairy.weatherwearback.common.enums.ClothesCategory;
+import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
+import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,25 +22,24 @@ public class Clothes {
 
     @Column
     @Comment("상의, 하의, 여성하의")
-    private int clothesCategory;
+    private ClothesCategory clothesCategory;
 
     @Column
     @Comment("봄1, 봄2, 여름1, 여름2, 가을1, 가을2, 겨울1, 겨울2")
-    private int tempCategory;
+    private TempCategory tempCategory;
 
     @Column
     @Comment("맑음, 흐림, 비, 눈, 비_눈, 바람, 구름많음")
-    private int skyCategory;
+    private SkyCategory skyCategory;
 
     @Column
-    private int clothesName;
+    private String clothesName;
 
     @Builder
-    public Clothes(int clothesCategory, int tempCategory, int skyCategory, int clothesName) {
+    public Clothes(ClothesCategory clothesCategory, TempCategory tempCategory, SkyCategory skyCategory, String clothesName) {
         this.clothesCategory = clothesCategory;
         this.tempCategory = tempCategory;
         this.skyCategory = skyCategory;
         this.clothesName = clothesName;
     }
-
 }
