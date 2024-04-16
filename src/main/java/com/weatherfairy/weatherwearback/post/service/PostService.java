@@ -1,14 +1,18 @@
 package com.weatherfairy.weatherwearback.post.service;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.weatherfairy.weatherwearback.common.current.GetCurrentData;
 import com.weatherfairy.weatherwearback.common.enums.Emoji;
 import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
 import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
+import com.weatherfairy.weatherwearback.post.dto.request.PostFilterCriteria;
 import com.weatherfairy.weatherwearback.post.dto.response.CreatePostResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostsResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostResponse;
 import com.weatherfairy.weatherwearback.post.entity.Post;
+import com.weatherfairy.weatherwearback.post.entity.QPost;
 import com.weatherfairy.weatherwearback.post.entity.vo.WeatherDataVO;
 import com.weatherfairy.weatherwearback.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,12 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import net.coobird.thumbnailator.Thumbnails;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +38,9 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final GetCurrentData getCurrentData;
+    private final JPAQueryFactory jpaQueryFactory;
 
-    private static String root = "C:\\Users\\jungi\\바탕 화면\\WeatherWear\\weatherwear-back\\weatherwear-back\\src\\main\\resources";
+    private static String root = "/Users/jungin/Desktop/weatherwear/back/src/main/resources";
     private static String filePath = root + "/images";
 
     private String saveImage(MultipartFile image) {
@@ -44,7 +52,7 @@ public class PostService {
         String fileName = StringUtils.cleanPath(image.getOriginalFilename());
 
         try {
-            String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+            String uniqueFileName = UUID.randomUUID() + "_" + fileName;
             File uploadDir = new File(filePath);
 
             if (!uploadDir.exists()) {
@@ -52,6 +60,7 @@ public class PostService {
             }
 
             String uploadPath = filePath + File.separator + uniqueFileName;
+
             image.transferTo(new File(uploadPath));
 
             return uploadPath;
@@ -60,6 +69,7 @@ public class PostService {
             e.printStackTrace();
             return null;
         }
+
     }
 
 //    @Transactional(readOnly = true)
@@ -149,4 +159,89 @@ public class PostService {
                 .collect(Collectors.toList());
 
     }
+
+    @Transactional(readOnly = true)
+    public List<GetPostsResponse> getPostsByFilter(PostFilterCriteria criteria) {
+
+        QPost post = QPost.post;
+
+        BooleanBuilder whereClause = new BooleanBuilder();
+
+        if (criteria.month() != null && !criteria.month().isEmpty()) {
+            whereClause.and(post.date.month().in(criteria.month()));
+        }
+
+
+        if (criteria.min() != null) {
+            whereClause.and(post.weatherDataVO.minTemp.goe(criteria.min()));
+        }
+
+        if (criteria.max() != null) {
+            whereClause.and(post.weatherDataVO.maxTemp.loe(criteria.max()));
+        }
+
+        if (criteria.emoji() != null) {
+            whereClause.and(post.emoji.eq(Emoji.from(criteria.emoji())));
+        }
+
+        if (criteria.sky() != null) {
+            whereClause.and(post.weatherDataVO.sky.in(SkyCategory.from(criteria.sky())));
+        }
+
+        List<Post> posts = jpaQueryFactory.selectFrom(post)
+                .where(whereClause)
+                .fetch();
+
+        System.out.println("posts = ");
+
+        List<GetPostsResponse> responses = posts.stream()
+                .map(GetPostsResponse::from)
+                .collect(Collectors.toList());
+
+        return responses;
+
+    }
+
+    //이미지 리사이징
+    private InputStream compressImage(InputStream inputStream) {
+        try {
+            BufferedImage originalImage = ImageIO.read(inputStream);
+            int imageWidth = originalImage.getWidth();
+            int imageHeight = originalImage.getHeight();
+            double outputQuality = 1.0;
+
+            // 압축된 이미지 생성 및 리사이징 반복
+            while (true) {
+                BufferedImage compressedImage = Thumbnails.of(originalImage)
+                        .size(imageWidth, imageHeight)
+                        .outputQuality(outputQuality)
+                        .asBufferedImage();
+
+                // 포맷 형식을 webp로 설정 -> 용량을 낮추기 위해
+                ByteArrayOutputStream compressedOutputStream = new ByteArrayOutputStream();
+                ImageIO.write(compressedImage, "webp", compressedOutputStream);
+
+                byte[] compressedData = compressedOutputStream.toByteArray();
+                int compressedSizeKB = compressedData.length / 1024;  // 바이트를 킬로바이트로 변환
+
+                // 압축된 이미지의 크기가 2MB 이하인 경우 반환
+                if (compressedSizeKB <= 2000) {
+                    return new ByteArrayInputStream(compressedData);
+                }
+
+                // 이미지의 크기가 2MB를 넘어갈 경우 퀄리티 조절, 리사이징
+                outputQuality -= 0.1;
+                imageWidth /= 5;
+                imageHeight /= 5;
+
+                if (outputQuality <= 0.5) {
+                    // 품질이 너무 낮아져도 2MB 이하 크기를 달성하지 못하는 경우, 예외처리
+                    throw new IllegalArgumentException("이미지 용량이 너무 큽니다.");
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -11,4 +11,13 @@ public enum Emoji {
     private Emoji(int value) {
         this.value = value;
     }
+
+    public static Emoji from(Integer value) {
+        for (Emoji emoji : Emoji.values()) {
+            if (emoji.value == value) {
+                return emoji;
+            }
+        }
+        throw new IllegalArgumentException("범위 내의 이모지가 아닙니다");
+    }
 }
