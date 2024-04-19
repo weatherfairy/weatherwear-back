@@ -13,7 +13,7 @@ public enum SkyCategory {
         this.value = value;
     }
 
-    public static SkyCategory from(int value) {
+    public static SkyCategory from(Integer value) {
         for (SkyCategory category : SkyCategory.values()) {
             if (category.value == value) {
                 return category;

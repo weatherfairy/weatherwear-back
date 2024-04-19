@@ -1,19 +1,24 @@
 package com.weatherfairy.weatherwearback.post.service;
 
+
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.weatherfairy.weatherwearback.common.current.GetCurrentData;
 import com.weatherfairy.weatherwearback.common.enums.Emoji;
 import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
 import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
+import com.weatherfairy.weatherwearback.post.dto.request.PostFilterCriteria;
 import com.weatherfairy.weatherwearback.post.dto.response.CreatePostResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostsResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostResponse;
 import com.weatherfairy.weatherwearback.post.entity.Post;
+import com.weatherfairy.weatherwearback.post.entity.QPost;
 import com.weatherfairy.weatherwearback.post.entity.vo.WeatherDataVO;
 import com.weatherfairy.weatherwearback.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,12 +31,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -43,9 +50,12 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final GetCurrentData getCurrentData;
+    private final JPAQueryFactory jpaQueryFactory;
+
 
     @Value("${firebase.bucket}")
     private String firebaseBucket;
+
 
     @Value("${firebase.storage-link}")
     private String storageLink;
@@ -91,7 +101,6 @@ public class PostService {
         }
     }
 
-
     private String saveImage(MultipartFile img) {
 
 
@@ -112,6 +121,7 @@ public class PostService {
         }
 
     }
+
 
 //    @Transactional(readOnly = true)
 //    public Page<GetPostsResponse> getPostsScroll(Pageable pageable, Long memberNo) {
@@ -210,4 +220,47 @@ public class PostService {
                 .collect(Collectors.toList());
 
     }
+
+    @Transactional(readOnly = true)
+    public List<GetPostsResponse> getPostsByFilter(PostFilterCriteria criteria) {
+
+        QPost post = QPost.post;
+
+        BooleanBuilder whereClause = new BooleanBuilder();
+
+        if (criteria.month() != null && !criteria.month().isEmpty()) {
+            whereClause.and(post.date.month().in(criteria.month()));
+        }
+
+
+        if (criteria.min() != null) {
+            whereClause.and(post.weatherDataVO.minTemp.goe(criteria.min()));
+        }
+
+        if (criteria.max() != null) {
+            whereClause.and(post.weatherDataVO.maxTemp.loe(criteria.max()));
+        }
+
+        if (criteria.emoji() != null) {
+            whereClause.and(post.emoji.eq(Emoji.from(criteria.emoji())));
+        }
+
+        if (criteria.sky() != null) {
+            whereClause.and(post.weatherDataVO.sky.in(SkyCategory.from(criteria.sky())));
+        }
+
+        List<Post> posts = jpaQueryFactory.selectFrom(post)
+                .where(whereClause)
+                .fetch();
+
+        System.out.println("posts = ");
+
+        List<GetPostsResponse> responses = posts.stream()
+                .map(GetPostsResponse::from)
+                .collect(Collectors.toList());
+
+        return responses;
+
+    }
+
 }
