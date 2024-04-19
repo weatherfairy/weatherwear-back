@@ -1,6 +1,7 @@
 package com.weatherfairy.weatherwearback.post.controller;
 
 import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
+import com.weatherfairy.weatherwearback.post.dto.request.PostFilterCriteria;
 import com.weatherfairy.weatherwearback.post.dto.response.CreatePostResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostsResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostResponse;
@@ -36,28 +37,17 @@ public class PostController {
 //    }
 
     @GetMapping("/api/v1/closet/lists")
-    public ResponseEntity<List<GetPostsResponse>> getAllPosts(
-//                                                            @RequestParam Integer page,
-//                                                            @RequestParam Integer size,
-                                                              @RequestParam(required = false) List<Integer> month,
-                                                              @RequestParam(required = false) Integer min,
-                                                              @RequestParam(required = false) Integer max,
-                                                              @RequestParam(required = false) Integer emoji,
-                                                              @RequestParam(required = false) List<Integer> sky) {
+    public ResponseEntity<List<GetPostsResponse>> getAllPosts(@ModelAttribute PostFilterCriteria criteria) {
 
         Long memberNo = 1L;
 
 //        Pageable pageable = PageRequest.of(page, size);
 
 //        Page<GetPostsResponse> response = postService.getPostsScroll(pageable, memberNo);
-        List<GetPostsResponse> response = postService.getAllPosts(memberNo);
+//        List<GetPostsResponse> response = postService.getAllPosts(memberNo);
 
-//        List<String> tempString = new ArrayList<>();
-//        tempString.add("month"+month.toString());
-//        tempString.add("min"+min.toString());
-//        tempString.add("max"+max.toString());
-//        tempString.add("emoji"+emoji.toString());
-//        tempString.add("sky"+sky.toString());
+        List<GetPostsResponse> response = postService.getPostsByFilter(criteria);
+
 
         return ResponseEntity.ok(response);
     }
