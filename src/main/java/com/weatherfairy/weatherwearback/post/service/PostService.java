@@ -2,8 +2,6 @@ package com.weatherfairy.weatherwearback.post.service;
 
 
 import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
 import com.querydsl.core.BooleanBuilder;

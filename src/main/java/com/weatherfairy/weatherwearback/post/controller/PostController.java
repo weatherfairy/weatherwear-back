@@ -49,7 +49,6 @@ public class PostController {
 
         List<GetPostsResponse> response = postService.getPostsByFilter(criteria);
 
-
         return ResponseEntity.ok(response);
     }
 

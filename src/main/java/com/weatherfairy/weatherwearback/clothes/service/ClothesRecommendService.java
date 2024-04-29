@@ -21,9 +21,9 @@ public class ClothesRecommendService {
     private final ClothesRepository clothesRepository;
     private final GetCurrentData getCurrentData;
 
-    private List<Long> recommendClothesByCategories(String locationName) {
+    public List<Long> recommendClothesByCategories(String temp) {
 
-        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
+        TempCategory tempCategory = getCurrentData.returnTempCategory(temp);
 
         List<Long> recommendedClothesIds = new ArrayList<>();
 
@@ -35,8 +35,10 @@ public class ClothesRecommendService {
 
     private Clothes getRandomClothes(ClothesCategory clothesCategory, TempCategory tempCategory) {
         List<Clothes> clothesList = clothesRepository.findAllByClothesCategoryAndTempCategory(clothesCategory, tempCategory);
+
+
         Random random = new Random();
-        return clothesList.get(random.nextInt(clothesList.size()));
+        return clothesList.get(0);
     }
 }
 
