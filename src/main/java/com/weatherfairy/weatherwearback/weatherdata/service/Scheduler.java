@@ -28,13 +28,13 @@ public class Scheduler {
     private final WeeklyDataRepository weeklyDataRepository;
 
 
-//    @Scheduled(cron = "0 30 01 * * *")
+//    @Scheduled(cron = "0 30 23 * * *")
     public void saveYesterdayData() {
         weatherDataService.getYesterdayFromToday();
     }
 
 
-//    @Scheduled(cron = "0 31 01 * * *")
+//    @Scheduled(cron = "0 40 23 * * *")
     public void getDailyWeather() throws ParseException, IOException {
 
         dailyDataRepository.deleteAllInBatch();
@@ -61,7 +61,7 @@ public class Scheduler {
         });
     }
 
-//    @Scheduled(cron = "0 32 01 * * *")
+//    @Scheduled(cron = "0 50 23 * * *")
     public void getWeeklyWeather() throws ParseException, IOException {
 
         weeklyDataRepository.deleteAllInBatch();

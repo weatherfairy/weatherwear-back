@@ -40,7 +40,9 @@ public class ParseWeatherData {
             if (index < 24) {
                 JSONObject wind = (JSONObject) item.get("wind");
                 windValues.add(wind.get("speed").toString());
-                popValues.add(item.get("pop").toString());
+
+                int adjustedPopValue = (int) (Double.parseDouble(item.get("pop").toString()) * 100);
+                popValues.add(Integer.toString(adjustedPopValue));
             }
             index++;
         }
@@ -64,9 +66,6 @@ public class ParseWeatherData {
         List<String> popValues = new ArrayList<>();
         List<Integer> skyValues = new ArrayList<>();
 
-        System.out.println("list.toJSONString() = " + list.toJSONString());
-
-
         for (Object obj : list) {
             JSONObject item = (JSONObject) obj;
             JSONObject temp = (JSONObject) item.get("temp");
@@ -77,7 +76,9 @@ public class ParseWeatherData {
             minTmpValues.add( temp.get("min").toString());
             maxTmpValues.add( temp.get("max").toString());
             skyValues.add(Integer.parseInt(weatherID.substring(0,1)));
-            popValues.add(item.get("pop").toString());
+
+            int adjustedPopValue = (int) (Double.parseDouble(item.get("pop").toString()) * 100);
+            popValues.add(Integer.toString(adjustedPopValue));
         }
 
         WeeklyData weeklyData = WeeklyData.builder()

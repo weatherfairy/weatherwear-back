@@ -5,7 +5,6 @@ import com.weatherfairy.weatherwearback.common.auth.TokenResponse;
 import com.weatherfairy.weatherwearback.member.service.KakaoOAuthService;
 import com.weatherfairy.weatherwearback.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

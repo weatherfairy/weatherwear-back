@@ -84,17 +84,17 @@ public class WeatherDataService {
 //        Long bottom = clothesRecommendService.recommendClothesByCategories(currentTemp).get(1);
 
 
-        for (int i = 0 ; i < 24 ; i += 3) {
+        for (int i = 2 ; i <= 24 ; i += 3) {
             temp1.add(yesterdayTemp.get(i));
             sky1.add(yesterdaySky.get(i));
             temp2.add(temp.get(i));
             sky2.add(sky.get(i));
         }
-        for (int i = 24 ; i < 48 ; i +=3) {
+        for (int i = 25 ; i <= 48 ; i +=3) {
             temp3.add(temp.get(i));
             sky3.add(sky.get(i));
         }
-        for (int i = 48 ; i < 72 ; i += 3) {
+        for (int i = 49 ; i <= 72 ; i += 3) {
             temp4.add(temp.get(i));
             sky4.add(sky.get(i));
         }
