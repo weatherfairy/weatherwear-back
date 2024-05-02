@@ -18,21 +18,19 @@ public class Member {
     private Long memberNo;
 
     @Column
-    @Comment("카카오 로그인 : id")
-    private String kakaoId;
+    private String email;
 
     @Column
-    @Comment("카카오 로그인 : 카카오에 설정된 이름")
-    private String kakaoName;
+    private String password;
 
     @Column
     @Comment("리프레시 토큰")
     private String refreshToken;
 
     @Builder
-    public Member(String kakaoId,  String kakaoName) {
-        this.kakaoId = kakaoId;
-        this.kakaoName = kakaoName;
+    public Member(String email,  String password) {
+        this.email = email;
+        this.password = password;
     }
 
     public void updateRefreshToken(String refreshToken) {
