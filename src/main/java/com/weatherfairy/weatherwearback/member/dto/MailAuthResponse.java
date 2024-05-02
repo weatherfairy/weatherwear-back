@@ -1,4 +1,6 @@
 package com.weatherfairy.weatherwearback.member.dto;
 
-public class temp {
+public record MailAuthResponse(
+        String code
+) {
 }

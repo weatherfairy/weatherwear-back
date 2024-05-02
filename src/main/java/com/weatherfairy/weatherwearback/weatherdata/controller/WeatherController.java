@@ -22,6 +22,10 @@ public class WeatherController {
     @GetMapping("/api/v1/weathers")
     public ResponseEntity<MainPageResponse> getMainData(@RequestParam("location") String locationName) throws ParseException, IOException {
 
+
+        scheduler.getDailyWeather();
+        scheduler.saveYesterdayData();
+        scheduler.getWeeklyWeather();
         MainPageResponse response = weatherDataService.getMainPageData(locationName);
 
         return ResponseEntity.ok(response);

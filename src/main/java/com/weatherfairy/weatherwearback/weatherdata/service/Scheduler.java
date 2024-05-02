@@ -40,25 +40,25 @@ public class Scheduler {
         dailyDataRepository.deleteAllInBatch();
 
 
-//        JSONArray weatherData = weatherAPIService.getDailyWeather(
-//                "37.57",
-//                "126.98"
-//
-//        );
-//        parseWeatherData.saveDailyData("서울특별시종로구",weatherData);
+        JSONArray weatherData = weatherAPIService.getDailyWeather(
+                "37.56",
+                "127"
 
-        List<Location> locations = locationRepository.findAll();
-        locations.forEach(location -> {
-            try {
-                JSONArray weatherData = weatherAPIService.getDailyWeather(
-                        location.getLatitude(),
-                        location.getLongitude()
-                );
-                parseWeatherData.saveDailyData(location.getLocationName(),weatherData);
-            } catch (ParseException | IOException e) {
-                e.printStackTrace();
-            }
-        });
+        );
+        parseWeatherData.saveDailyData("서울특별시중구",weatherData);
+
+//        List<Location> locations = locationRepository.findAll();
+//        locations.forEach(location -> {
+//            try {
+//                JSONArray weatherData = weatherAPIService.getDailyWeather(
+//                        location.getLatitude(),
+//                        location.getLongitude()
+//                );
+//                parseWeatherData.saveDailyData(location.getLocationName(),weatherData);
+//            } catch (ParseException | IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
     }
 
 //    @Scheduled(cron = "0 50 23 * * *")
@@ -67,25 +67,25 @@ public class Scheduler {
         weeklyDataRepository.deleteAllInBatch();
 
 
-//        JSONArray weatherData = weatherAPIService.getWeeklyWeather(
-//                   "37.57",
-//                 "126.98"
-//
-//        );
-//        parseWeatherData.saveWeeklyData("서울특별시종로구",weatherData);
+        JSONArray weatherData = weatherAPIService.getWeeklyWeather(
+                   "37.56",
+                 "127"
 
-        List<Location> locations = locationRepository.findAll();
-        locations.forEach(location -> {
-            try {
-                JSONArray weatherData = weatherAPIService.getWeeklyWeather(
-                        location.getLatitude(),
-                        location.getLongitude()
-                );
-                parseWeatherData.saveWeeklyData(location.getLocationName(),weatherData);
-            } catch (ParseException | IOException e) {
-                e.printStackTrace();
-            }
-        });
+        );
+        parseWeatherData.saveWeeklyData("서울특별시중구",weatherData);
+
+//        List<Location> locations = locationRepository.findAll();
+//        locations.forEach(location -> {
+//            try {
+//                JSONArray weatherData = weatherAPIService.getWeeklyWeather(
+//                        location.getLatitude(),
+//                        location.getLongitude()
+//                );
+//                parseWeatherData.saveWeeklyData(location.getLocationName(),weatherData);
+//            } catch (ParseException | IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
     }
 }
 
