@@ -1,6 +1,7 @@
 package com.weatherfairy.weatherwearback.member.dto;
 
 public record MailAuthRequest(
-        String email
+        String email,
+        String code
 ) {
 }

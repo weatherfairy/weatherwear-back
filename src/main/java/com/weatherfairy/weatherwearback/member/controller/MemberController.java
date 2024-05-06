@@ -1,57 +1,56 @@
 package com.weatherfairy.weatherwearback.member.controller;
 
-import com.weatherfairy.weatherwearback.common.auth.JwtTokenProvider;
-import com.weatherfairy.weatherwearback.common.auth.TokenResponse;
-import com.weatherfairy.weatherwearback.member.service.KakaoOAuthService;
+import com.weatherfairy.weatherwearback.member.dto.*;
+import com.weatherfairy.weatherwearback.member.service.MailService;
 import com.weatherfairy.weatherwearback.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
-    private final KakaoOAuthService kakaoOauthService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final MailService mailService;
 
+    @PostMapping("/member/signup/email")
+    public ResponseEntity<Boolean> mailAuthentication(@RequestParam("email") String email) {
 
-    @RequestMapping("/api/v1/login/kakao")
-    public ResponseEntity<Void> kakaoLogin() {
+        String verifiedCode = mailService.sendMail(email);
 
-        URI kakaoUri = URI.create(kakaoOauthService.getKakaoUri());
+        MailAuthResponse response = MailAuthResponse.from(verifiedCode);
 
-        return ResponseEntity.status(HttpStatus.FOUND).location(kakaoUri).build();
+        return ResponseEntity.ok(true);
     }
 
-    @RequestMapping("/api/v1/login/kakao/callback")
-    public ResponseEntity<TokenResponse> kakaoCallback(@RequestParam("code") String code) {
+    @PostMapping("/member/signup/verify")
+    public ResponseEntity<Boolean> verifyEmail(@RequestBody MailAuthRequest request) {
 
-        Map<String, String> tokens = kakaoOauthService.kakaoOauth(code);
+        if(mailService.verifyCode(request.email(), request.code())) {
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Authorization", tokens.get("accessToken"));
-//        headers.add("Refresh-Token", tokens.get("refreshToken"));
+            return ResponseEntity.ok(true);
+        }
 
-        TokenResponse tokenResponse = new TokenResponse(tokens.get("accessToken"), tokens.get("refreshToken"));
-
-        return ResponseEntity.ok(tokenResponse);
+        return ResponseEntity.ok(false);
     }
 
-    @PutMapping("/api/v1/unlink/kakao")
-    public ResponseEntity<Boolean> kakaoLogout(@RequestHeader(value = "Authorization") String token) {
+    @PostMapping("/member/signup")
+    public ResponseEntity<Boolean> signUp(@RequestBody RegistMemberRequest request) {
 
-        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        memberService.signup(request);
+        return ResponseEntity.ok(true);
 
-        boolean isActive = kakaoOauthService.unlinkAndDeleteMember(memberNo);
+    }
 
-        return ResponseEntity.ok()
-                .body(isActive);
+
+
+    @PostMapping("/member/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+
+        LoginResponse response = memberService.login(request);
+
+        return ResponseEntity.ok(response);
     }
 
 }

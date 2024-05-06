@@ -31,7 +31,7 @@ public class WeatherAPIService {
         urlBuilder.append("&" + URLEncoder.encode("lon", "UTF-8") + "=" + URLEncoder.encode(longitude, "UTF-8"));
         urlBuilder.append("&" + URLEncoder.encode("appid", "UTF-8") + "=" + serviceKey);
         urlBuilder.append("&" + URLEncoder.encode("units", "UTF-8") + "=" + URLEncoder.encode("metric", "UTF-8"));
-        urlBuilder.append("&" + URLEncoder.encode("cnt", "UTF-8") + "=" + URLEncoder.encode("72", "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("cnt", "UTF-8") + "=" + URLEncoder.encode("73", "UTF-8"));
 
         URL url = new URL(urlBuilder.toString());
 

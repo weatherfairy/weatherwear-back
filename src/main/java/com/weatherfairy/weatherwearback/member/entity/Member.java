@@ -1,16 +1,18 @@
 package com.weatherfairy.weatherwearback.member.entity;
 
+import com.weatherfairy.weatherwearback.common.enums.Gender;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
 @Table(name = "TBL_MEMBER")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Member {
 
     @Id
@@ -24,16 +26,14 @@ public class Member {
     private String password;
 
     @Column
-    @Comment("리프레시 토큰")
-    private String refreshToken;
+    private Gender gender;
+
 
     @Builder
-    public Member(String email,  String password) {
+    public Member(String email,  String password, Gender gender) {
         this.email = email;
         this.password = password;
+        this.gender = gender;
     }
 
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
 }

@@ -2,12 +2,12 @@ package com.weatherfairy.weatherwearback.member.dto;
 
 import com.weatherfairy.weatherwearback.member.entity.Member;
 
-public record MemberCommandResponse(
+public record RegistMemberResponse(
         String email
 ) {
 
-    public static MemberCommandResponse from(Member member) {
-        return new MemberCommandResponse(
+    public static RegistMemberResponse from(Member member) {
+        return new RegistMemberResponse(
                 member.getEmail()
         );
     }

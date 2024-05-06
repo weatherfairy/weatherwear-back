@@ -18,24 +18,32 @@ import java.util.UUID;
 public class MailService {
 
     private final JavaMailSender javaMailSender;
-    private final RedisService redisService;
+    private final EmailCodeService emailCodeService;
+
+//    private String setContext(String code) {
+//        Context context = new Context();
+//        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+//        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+//
+//        context.setVariable("code", code);
+//
+//        templateResolver.setPrefix("templates/");
+//        templateResolver.setSuffix(".html");
+//        templateResolver.setTemplateMode(TemplateMode.HTML);
+//        templateResolver.setCacheable(false);
+//
+//        templateEngine.setTemplateResolver(templateResolver);
+//
+//        return templateEngine.process("mail", context);
+//
+//    }
 
     private String setContext(String code) {
         Context context = new Context();
-        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
 
         context.setVariable("code", code);
 
-        templateResolver.setPrefix("templates/");
-        templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateResolver.setCacheable(false);
-
-        templateEngine.setTemplateResolver(templateResolver);
-
-        return templateEngine.process("mail", context);
-
+        return "코드를 입력해주세요: " + code;
     }
 
     private MimeMessage createMessage(String code, String email) throws MessagingException {
@@ -45,9 +53,9 @@ public class MailService {
         message.addRecipients(Message.RecipientType.TO, email);
         message.setSubject("WeatherWear 회원가입 본인인증 코드입니다.");
         message.setText(setContext(code), "utf-8", "html");
-        message.setFrom("weatherwear@naver.com");
+        message.setFrom("metamingle@naver.com");
 
-        redisService.setDataExpire(email, code, 60 * 5L);
+        emailCodeService.setEmailCode(email, code);
 
         return message;
     }
@@ -55,6 +63,8 @@ public class MailService {
     public String sendMail(String email) {
 
         String code = UUID.randomUUID().toString().substring(0, 8);
+
+        System.out.println("code = " + code);
 
         try {
             MimeMessage message = createMessage(code, email);
@@ -68,7 +78,7 @@ public class MailService {
 
     public Boolean verifyCode(String email, String code) {
 
-        String codeForEmail = redisService.getData(email);
+        String codeForEmail = emailCodeService.getCode(email);
 
         if (codeForEmail == null) {
             throw new IllegalArgumentException("인증요청 기록이 없는 이메일입니다.");

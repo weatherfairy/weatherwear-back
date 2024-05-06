@@ -34,8 +34,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 jwtTokenProvider.validateAccessToken(accessToken);
                 filterChain.doFilter(request, response);
             }
-        } catch (ExpiredJwtException e) {
-            handleExpiredAccessToken(request, response, filterChain);
         } catch (IllegalArgumentException e) {
             handleExceptionWithErrorCode(response, 501);
         } catch (Exception e) {
@@ -45,23 +43,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String[] excludePath = {"/login/kakao", "/api/v1"};
+        String[] excludePath = {"/api/v1"};
         String path = request.getRequestURI();
 
         return Arrays.stream(excludePath).anyMatch(path::contains);
-    }
-
-    private void handleExpiredAccessToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws IOException, ServletException {
-        String refreshToken = jwtTokenProvider.extractRefreshTokenFromRequest(request);
-        try {
-            jwtTokenProvider.validateRefreshToken(refreshToken);
-            String newAccessToken = jwtTokenProvider.renewAccessToken(refreshToken);
-            response.setHeader("Authorization", "Bearer " + newAccessToken);
-            filterChain.doFilter(request, response);
-        } catch (IllegalArgumentException ex) {
-            handleExceptionWithErrorCode(response, 501);
-        }
     }
 
     private void handleExceptionWithErrorCode(HttpServletResponse response, int errorCode) throws IOException {
