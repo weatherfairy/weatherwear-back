@@ -91,7 +91,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/api/v1/closet/{postNo}")
+    @DeleteMapping("/api/v1/closet/{postNo}")
     public ResponseEntity<String> deletePost(@PathVariable("postNo") Long postNo) {
 
         Boolean response = postService.deletePost(postNo);

@@ -1,6 +1,8 @@
 package com.weatherfairy.weatherwearback.member.controller;
 
+import com.weatherfairy.weatherwearback.common.auth.EmailCode;
 import com.weatherfairy.weatherwearback.member.dto.*;
+import com.weatherfairy.weatherwearback.member.service.EmailCodeService;
 import com.weatherfairy.weatherwearback.member.service.MailService;
 import com.weatherfairy.weatherwearback.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MailService mailService;
+    private final EmailCodeService emailCodeService;
 
     @PostMapping("/member/signup/email")
     public ResponseEntity<Boolean> mailAuthentication(@RequestParam("email") String email) {
@@ -28,7 +31,7 @@ public class MemberController {
     public ResponseEntity<Boolean> verifyEmail(@RequestBody MailAuthRequest request) {
 
         if(mailService.verifyCode(request.email(), request.code())) {
-
+            emailCodeService.deleteCode(request.email());
             return ResponseEntity.ok(true);
         }
 
