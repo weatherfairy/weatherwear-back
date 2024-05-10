@@ -25,4 +25,8 @@ public class EmailCode {
         this.email = email;
         this.code = code;
     }
+
+    public void update(String code) {
+        this.code = code;
+    }
 }

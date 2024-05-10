@@ -87,7 +87,4 @@ public class MailService {
         return codeForEmail.equals(code);
 
     }
-
-
-
 }

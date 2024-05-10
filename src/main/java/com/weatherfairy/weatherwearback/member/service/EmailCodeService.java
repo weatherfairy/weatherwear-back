@@ -17,17 +17,29 @@ public class EmailCodeService {
     @Transactional
     public void setEmailCode(String email, String code) {
 
-        EmailCode emailCode = EmailCode.builder()
-                .email(email)
-                .code(code)
-                .build();
+        Optional<EmailCode> optionalEmailCode = emailCodeRepository.findByEmail(email);
 
-        emailCodeRepository.save(emailCode);
+        if (optionalEmailCode.isPresent()) {
+            EmailCode existingEmailCode = optionalEmailCode.get();
+            existingEmailCode.update(code);
+            emailCodeRepository.save(existingEmailCode);
+        } else {
+            EmailCode newEmailCode = EmailCode.builder()
+                    .email(email)
+                    .code(code)
+                    .build();
+            emailCodeRepository.save(newEmailCode);
+        }
 
     }
 
     public String getCode(String email) {
         Optional<EmailCode> emailCode = emailCodeRepository.findByEmail(email);
         return emailCode.get().getCode();
+    }
+
+    public void deleteCode(String email) {
+        Optional<EmailCode> emailCode = emailCodeRepository.findByEmail(email);
+        emailCodeRepository.deleteById(emailCode.get().getCodeNo());
     }
 }
