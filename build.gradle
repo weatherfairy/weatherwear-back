@@ -58,6 +58,18 @@ dependencies {
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+    //jwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
+    // java mail sender
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'io.lettuce:lettuce-core:6.2.1.RELEASE'
+
+    //thymeleaf
+    implementation'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 }
 
 def generated = 'src/main/generated'

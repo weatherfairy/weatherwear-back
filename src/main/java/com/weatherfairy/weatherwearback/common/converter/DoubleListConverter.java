@@ -7,35 +7,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Converter(autoApply = true)
-public class IntListConverter implements AttributeConverter<List<Integer>, String> {
+public class DoubleListConverter implements AttributeConverter<List<Double>, String> {
     @Override
-    public String convertToDatabaseColumn(List<Integer> integers) {
-        if (integers == null || integers.isEmpty()) {
+    public String convertToDatabaseColumn(List<Double> doubles) {
+        if (doubles == null || doubles.isEmpty()) {
             return null;
         }
         StringBuilder stringBuilder = new StringBuilder();
-        for (Integer integerValue : integers) {
-            stringBuilder.append(integerValue).append(",");
+        for (Double doubleValue : doubles) {
+            stringBuilder.append(doubleValue).append(",");
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         return stringBuilder.toString();
     }
 
     @Override
-    public List<Integer> convertToEntityAttribute(String dbData) {
+    public List<Double> convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.isEmpty()) {
             return new ArrayList<>();
         }
+        dbData = dbData.substring(1, dbData.length() - 1);
         String[] parts = dbData.split(",");
-        List<Integer> intList = new ArrayList<>();
+        List<Double> doubleList = new ArrayList<>();
         for (String part : parts) {
             try {
-                intList.add(Integer.parseInt(part.trim()));
+                doubleList.add(Double.parseDouble(part.trim()));
             } catch (NumberFormatException e) {
-                intList.add(2);
+                doubleList.add(0.0);
             }
         }
-        return intList;
+        return doubleList;
     }
 
 }

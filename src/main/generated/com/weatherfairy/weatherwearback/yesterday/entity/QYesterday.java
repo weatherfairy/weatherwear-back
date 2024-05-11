@@ -20,19 +20,11 @@ public class QYesterday extends EntityPathBase<Yesterday> {
 
     public static final QYesterday yesterday = new QYesterday("yesterday");
 
-    public final ListPath<Float, NumberPath<Float>> feelsLike = this.<Float, NumberPath<Float>>createList("feelsLike", Float.class, NumberPath.class, PathInits.DIRECT2);
-
     public final StringPath locationName = createString("locationName");
-
-    public final NumberPath<Float> maxTemp = createNumber("maxTemp", Float.class);
-
-    public final NumberPath<Float> minTemp = createNumber("minTemp", Float.class);
-
-    public final ListPath<String, StringPath> rain = this.<String, StringPath>createList("rain", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final ListPath<Integer, NumberPath<Integer>> skyCategory = this.<Integer, NumberPath<Integer>>createList("skyCategory", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Float, NumberPath<Float>> temperature = this.<Float, NumberPath<Float>>createList("temperature", Float.class, NumberPath.class, PathInits.DIRECT2);
+    public final ListPath<String, StringPath> temperature = this.<String, StringPath>createList("temperature", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> yesterdayId = createNumber("yesterdayId", Integer.class);
 

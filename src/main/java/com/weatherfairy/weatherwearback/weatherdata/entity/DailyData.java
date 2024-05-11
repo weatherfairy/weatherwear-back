@@ -1,6 +1,5 @@
-package com.weatherfairy.weatherwearback.yesterday.entity;
+package com.weatherfairy.weatherwearback.weatherdata.entity;
 
-import com.weatherfairy.weatherwearback.common.converter.FloatListConverter;
 import com.weatherfairy.weatherwearback.common.converter.IntListConverter;
 import com.weatherfairy.weatherwearback.common.converter.StringListConverter;
 import jakarta.persistence.*;
@@ -15,12 +14,12 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "TBL_YESTERDAY")
-public class Yesterday{
+@Table(name = "TBL_DAILY")
+public  class DailyData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int yesterdayId;
+    private int todayId;
 
     @Column
     @Comment("장소 이름")
@@ -30,16 +29,25 @@ public class Yesterday{
     @Convert(converter = StringListConverter.class)
     private List<String> temperature;
 
+    @Column(length = 1000)
+    @Convert(converter = StringListConverter.class)
+    private List<String> windSpeed;
+
     @Column
     @Convert(converter = IntListConverter.class)
     private List<Integer> skyCategory;
 
+    @Column(length = 1000)
+    @Convert(converter = StringListConverter.class)
+    private List<String> rain;
 
     @Builder
-    public Yesterday(String locationName, List<String> temperature, List<Integer> skyCategory) {
+    public DailyData(String locationName, List<String> temperature, List<String> windSpeed, List<Integer> skyCategory, List<String> rain) {
         this.locationName = locationName;
         this.temperature = temperature;
+        this.windSpeed = windSpeed;
         this.skyCategory = skyCategory;
+        this.rain = rain;
     }
 
 }

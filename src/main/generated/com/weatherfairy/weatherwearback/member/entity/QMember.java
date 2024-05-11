@@ -19,17 +19,11 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
-    public final StringPath account = createString("account");
-
     public final StringPath email = createString("email");
 
-    public final StringPath kakaoId = createString("kakaoId");
-
-    public final StringPath kakaoName = createString("kakaoName");
+    public final EnumPath<com.weatherfairy.weatherwearback.common.enums.Gender> gender = createEnum("gender", com.weatherfairy.weatherwearback.common.enums.Gender.class);
 
     public final NumberPath<Long> memberNo = createNumber("memberNo", Long.class);
-
-    public final StringPath nickname = createString("nickname");
 
     public final StringPath password = createString("password");
 

@@ -27,17 +27,11 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
         if (dbData == null || dbData.isEmpty()) {
             return new ArrayList<>();
         }
-        dbData = dbData.substring(1, dbData.length() - 1);
         String[] parts = dbData.split(",");
         List<String> stringList = new ArrayList<>();
         for (String part : parts) {
-            try {
-                stringList.add(part.trim());
-            } catch (NumberFormatException e) {
-                System.out.println("e = " + e);
-            }
+            stringList.add(part.trim());
         }
         return stringList;
     }
-
 }
