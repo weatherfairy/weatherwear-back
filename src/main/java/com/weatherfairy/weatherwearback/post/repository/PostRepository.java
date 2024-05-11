@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-//    Page<Post> findAllByMemberNo(Long memberNo, Pageable pageable);
+    //    Page<Post> findAllByMemberNo(Long memberNo, Pageable pageable);
     List<Post> findAllByMemberNo(Long memberNo);
 
     @Query("SELECT p FROM Post p WHERE p.weatherDataVO.sky = :skyCategory " +
@@ -23,4 +23,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findRecentPostsBySkyAndTempCategory(@Param("memberNo") Long memberNo,
                                                    @Param("skyCategory") SkyCategory skyCategory,
                                                    @Param("tempCategory") TempCategory tempCategory);
+
+
+    @Query("SELECT NEW list(p.weatherDataVO.minTemp, p.weatherDataVO.maxTemp, p.weatherDataVO.sky) FROM Post p WHERE p.memberNo = :memberNo")
+    List<List<Object>> getDataAsList(@Param("memberNo") Long memberNo);
+
 }

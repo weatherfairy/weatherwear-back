@@ -77,8 +77,6 @@ public class WeatherAPIService {
 
         URL url = new URL(urlBuilder.toString());
 
-        System.out.println("url = " + url);
-
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");

@@ -4,12 +4,13 @@ package com.weatherfairy.weatherwearback.post.service;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.weatherfairy.weatherwearback.common.current.GetCurrentData;
 import com.weatherfairy.weatherwearback.common.enums.Emoji;
 import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
-import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
 import com.weatherfairy.weatherwearback.post.dto.request.PostFilterCriteria;
 import com.weatherfairy.weatherwearback.post.dto.response.CreatePostResponse;
@@ -19,6 +20,8 @@ import com.weatherfairy.weatherwearback.post.entity.Post;
 import com.weatherfairy.weatherwearback.post.entity.QPost;
 import com.weatherfairy.weatherwearback.post.entity.vo.WeatherDataVO;
 import com.weatherfairy.weatherwearback.post.repository.PostRepository;
+import com.weatherfairy.weatherwearback.weatherdata.entity.WeeklyData;
+import com.weatherfairy.weatherwearback.weatherdata.repository.WeeklyDataRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
@@ -38,8 +41,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +56,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final GetCurrentData getCurrentData;
     private final JPAQueryFactory jpaQueryFactory;
+    private final WeeklyDataRepository weeklyDataRepository;
+    private final ChatGPTService chatGPTService;
 
 
     @Value("${firebase.bucket}")
@@ -57,6 +66,8 @@ public class PostService {
 
     @Value("${firebase.storage-link}")
     private String storageLink;
+
+
 
     private InputStream compressImage(InputStream inputStream) {
         try {
@@ -140,18 +151,6 @@ public class PostService {
                 post.getReview(), post.getEmoji().getValue(), post.getWeatherDataVO().getSky().getValue());
     }
 
-    @Transactional(readOnly = true)
-    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
-
-        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
-        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
-
-        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
-
-        return posts.stream()
-                .map(GetPostResponse::from)
-                .collect(Collectors.toList());
-    }
 
     @Transactional
     public CreatePostResponse createPost(MultipartFile image1,
@@ -259,6 +258,66 @@ public class PostService {
 
         return responses;
 
+    }
+
+    //    @Transactional(readOnly = true)
+//    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
+//
+//        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
+//        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
+//
+//        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
+//
+//        return posts.stream()
+//                .map(GetPostResponse::from)
+//                .collect(Collectors.toList());
+//    }
+
+
+    public static List<Long> extractNumbers(String str) {
+        List<Long> numbers = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            numbers.add(Long.parseLong(matcher.group()));
+        }
+        return numbers;
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
+
+        ArrayList<Object> temps = new ArrayList<>();
+        List<Post> posts = new ArrayList<>();
+
+        List<List<Object>> memberPosts = postRepository.getDataAsList(1L);
+
+        Optional<WeeklyData> weeklyData = weeklyDataRepository.findByLocationName(locationName);
+
+        temps.add(weeklyData.get().getMinTemp().get(0));
+        temps.add(weeklyData.get().getMaxTemp().get(0));
+        temps.add(SkyCategory.from(weeklyData.get().getDaySky().get(0)));
+
+        System.out.println("postRepository = " + memberPosts.toString());
+        System.out.println("temps = " + temps.toString());
+
+        String response = chatGPTService.sendRequest(temps.toString(), memberPosts.toString());
+
+        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
+
+        String content = jsonObject.getAsJsonArray("choices").get(0)
+                .getAsJsonObject().get("message").getAsJsonObject()
+                .get("content").getAsString();
+
+        List<Long> numbers = extractNumbers(content);
+        for (Long number : numbers) {
+            Optional<Post> post = postRepository.findById(number);
+            posts.add(post.get());
+        }
+
+        return posts.stream()
+                .map(GetPostResponse::from)
+                .collect(Collectors.toList());
     }
 
 }

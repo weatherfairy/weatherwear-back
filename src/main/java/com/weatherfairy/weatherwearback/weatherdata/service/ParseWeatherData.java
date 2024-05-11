@@ -35,7 +35,15 @@ public class ParseWeatherData {
             String weatherID = weatherObject.get("id").toString();
 
             tmpValues.add( main.get("temp").toString());
-            skyValues.add(Integer.parseInt(weatherID.substring(0,1)));
+
+
+            if (weatherID.equals("800")) {
+                skyValues.add(8);
+            } else if (weatherID.startsWith("8")) {
+                skyValues.add(7);
+            } else {
+                skyValues.add(Integer.parseInt(weatherID.substring(0,1)));
+            }
 
             if (index < 24) {
                 JSONObject wind = (JSONObject) item.get("wind");
@@ -75,7 +83,15 @@ public class ParseWeatherData {
 
             minTmpValues.add( temp.get("min").toString());
             maxTmpValues.add( temp.get("max").toString());
-            skyValues.add(Integer.parseInt(weatherID.substring(0,1)));
+
+
+            if (weatherID.equals("800")) {
+                skyValues.add(8);
+            } else if (weatherID.startsWith("8")) {
+                skyValues.add(7);
+            } else {
+                skyValues.add(Integer.parseInt(weatherID.substring(0,1)));
+            }
 
             int adjustedPopValue = (int) (Double.parseDouble(item.get("pop").toString()) * 100);
             popValues.add(Integer.toString(adjustedPopValue));
