@@ -6,8 +6,8 @@ public record PostFilterCriteria(
          List<Integer> month,
          Integer min,
          Integer max,
-         Integer emoji,
-         Integer sky
+         List<Integer> emoji,
+         List<Integer> sky
 ) {
 
 }

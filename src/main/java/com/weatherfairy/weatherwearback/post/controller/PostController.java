@@ -25,36 +25,19 @@ public class PostController {
 
     private final PostService postService;
 
-//    @GetMapping("/api/v1/closet/lists")
-//    public ResponseEntity<Page<GetPostsResponse>> getAllPosts(@RequestBody Map<String, Object> filters) {
-//
-//        Long memberNo = 1L;
-//
-//        Pageable pageable = PageRequest.of((Integer) filters.get("page"), (Integer) filters.get("size"));
-//
-//        Page<GetPostsResponse> response = postService.getPostsScroll(pageable, memberNo);
-//
-//        return ResponseEntity.ok(response);
-//    }
-
     @GetMapping("/api/v1/closet/lists")
-    public ResponseEntity<List<GetPostsResponse>> getAllPosts(@ModelAttribute PostFilterCriteria criteria) {
+    public ResponseEntity<List<GetPostsResponse>> getAllPosts(@RequestHeader("Authorization")String token,
+                                                              @ModelAttribute PostFilterCriteria criteria) {
 
-        Long memberNo = 1L;
-
-//        Pageable pageable = PageRequest.of(page, size);
-
-//        Page<GetPostsResponse> response = postService.getPostsScroll(pageable, memberNo);
-//        List<GetPostsResponse> response = postService.getAllPosts(memberNo);
-
-        List<GetPostsResponse> response = postService.getPostsByFilter(criteria);
+        List<GetPostsResponse> response = postService.getPostsByFilter(token, criteria);
 
         return ResponseEntity.ok(response);
     }
 
 
     @GetMapping("/api/v1/closet/lists/{postNo}")
-    public ResponseEntity<GetPostResponse> getPost(@PathVariable Long postNo) {
+    public ResponseEntity<GetPostResponse> getPost(@RequestHeader("Authorization")String token,
+                                                   @PathVariable Long postNo) {
 
         GetPostResponse response = postService.getPost(postNo);
 
@@ -62,16 +45,16 @@ public class PostController {
     }
 
     @GetMapping("/api/v1/closet/recommend")
-    public ResponseEntity<List<GetPostResponse>> getRecommendedPosts(@RequestParam("location") String locationName) {
-        Long memberNo = 1L;
-
-        List<GetPostResponse> recommendedPosts = postService.getRecommendedPosts(memberNo, locationName);
+    public ResponseEntity<List<GetPostResponse>> getRecommendedPosts(@RequestHeader("Authorization")String token,
+                                                                     @RequestParam("location") String locationName) {
+        List<GetPostResponse> recommendedPosts = postService.getRecommendedPosts(token, locationName);
 
         return ResponseEntity.ok(recommendedPosts);
     }
 
     @PostMapping("/api/v1/closet")
     public ResponseEntity<CreatePostResponse> createPost(
+            @RequestHeader("Authorization")String token,
             @RequestPart(value = "image1", required = false) MultipartFile image1,
             @RequestPart(value = "image2", required = false) MultipartFile image2,
             @RequestPart(value = "image3", required = false) MultipartFile image3,
@@ -81,18 +64,19 @@ public class PostController {
             @RequestPart("review") String review,
             @RequestPart("emoji") String emoji,
             @RequestPart("sky") String sky
-    ) {
+    ) throws IOException {
 
         CreatePostRequest request = new CreatePostRequest( Float.parseFloat(minTemp), Float.parseFloat(maxTemp),
                 clothesText, review, Integer.parseInt(emoji), Integer.parseInt(sky));
 
-        CreatePostResponse response = postService.createPost(image1,image2,image3, request);
+        CreatePostResponse response = postService.createPost(token, image1,image2,image3, request);
 
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/api/v1/closet/{postNo}")
-    public ResponseEntity<String> deletePost(@PathVariable("postNo") Long postNo) {
+    public ResponseEntity<String> deletePost(@RequestHeader("Authorization")String token,
+                                             @PathVariable("postNo") Long postNo) {
 
         Boolean response = postService.deletePost(postNo);
 

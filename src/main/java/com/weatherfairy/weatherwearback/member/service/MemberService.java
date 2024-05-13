@@ -3,6 +3,7 @@ package com.weatherfairy.weatherwearback.member.service;
 import com.weatherfairy.weatherwearback.common.auth.AccessTokenInfo;
 import com.weatherfairy.weatherwearback.common.auth.JwtTokenProvider;
 import com.weatherfairy.weatherwearback.common.auth.PasswordEncoder;
+import com.weatherfairy.weatherwearback.common.enums.Gender;
 import com.weatherfairy.weatherwearback.member.dto.LoginRequest;
 import com.weatherfairy.weatherwearback.member.dto.LoginResponse;
 import com.weatherfairy.weatherwearback.member.dto.RegistMemberResponse;
@@ -52,5 +53,28 @@ public class MemberService {
         }
 
         return new LoginResponse(jwtTokenProvider.createAccessToken(new AccessTokenInfo(member.getMemberNo())));
+    }
+
+    @Transactional
+    public Boolean deleteMember(Long memberNo) {
+        try {
+            memberRepository.deleteById(memberNo);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String createDummy() {
+
+        RegistMemberRequest request = new RegistMemberRequest("mail", "password",Gender.FEMALE);
+
+        RegistMemberResponse response = signup(request);
+
+        LoginRequest request1 = new LoginRequest("mail", "password");
+
+        LoginResponse response1 = login(request1);
+
+        return  response1.token();
     }
 }
