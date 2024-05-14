@@ -11,6 +11,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.weatherfairy.weatherwearback.common.current.GetCurrentData;
 import com.weatherfairy.weatherwearback.common.enums.Emoji;
 import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
+import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
 import com.weatherfairy.weatherwearback.post.dto.request.PostFilterCriteria;
 import com.weatherfairy.weatherwearback.post.dto.response.CreatePostResponse;
@@ -172,10 +173,15 @@ public class PostService {
             image3Url = saveImage(image3);
         }
 
+        float mean = (request.max() + request.min())/2;
+
+        TempCategory tempCategory = getCurrentData.returnTempCategory(mean);
+
         WeatherDataVO weatherDataVO = WeatherDataVO.builder()
                 .sky(SkyCategory.SNOW)
                 .maxTemp(request.max())
                 .minTemp(request.min())
+                .tempCategory(tempCategory)
                 .build();
 
         Post post = postRepository.save(Post.builder()
@@ -260,18 +266,18 @@ public class PostService {
 
     }
 
-    //    @Transactional(readOnly = true)
-//    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
-//
-//        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
-//        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
-//
-//        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
-//
-//        return posts.stream()
-//                .map(GetPostResponse::from)
-//                .collect(Collectors.toList());
-//    }
+        @Transactional(readOnly = true)
+    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
+
+        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
+        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
+
+        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
+
+        return posts.stream()
+                .map(GetPostResponse::from)
+                .collect(Collectors.toList());
+    }
 
 
     public static List<Long> extractNumbers(String str) {
@@ -284,40 +290,40 @@ public class PostService {
         return numbers;
     }
 
-    @Transactional(readOnly = true)
-    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
-
-        ArrayList<Object> temps = new ArrayList<>();
-        List<Post> posts = new ArrayList<>();
-
-        List<List<Object>> memberPosts = postRepository.getDataAsList(1L);
-
-        Optional<WeeklyData> weeklyData = weeklyDataRepository.findByLocationName(locationName);
-
-        temps.add(weeklyData.get().getMinTemp().get(0));
-        temps.add(weeklyData.get().getMaxTemp().get(0));
-        temps.add(SkyCategory.from(weeklyData.get().getDaySky().get(0)));
-
-        System.out.println("postRepository = " + memberPosts.toString());
-        System.out.println("temps = " + temps.toString());
-
-        String response = chatGPTService.sendRequest(temps.toString(), memberPosts.toString());
-
-        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
-
-        String content = jsonObject.getAsJsonArray("choices").get(0)
-                .getAsJsonObject().get("message").getAsJsonObject()
-                .get("content").getAsString();
-
-        List<Long> numbers = extractNumbers(content);
-        for (Long number : numbers) {
-            Optional<Post> post = postRepository.findById(number);
-            posts.add(post.get());
-        }
-
-        return posts.stream()
-                .map(GetPostResponse::from)
-                .collect(Collectors.toList());
-    }
+//    @Transactional(readOnly = true)
+//    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
+//
+//        ArrayList<Object> temps = new ArrayList<>();
+//        List<Post> posts = new ArrayList<>();
+//
+//        List<List<Object>> memberPosts = postRepository.getDataAsList(1L);
+//
+//        Optional<WeeklyData> weeklyData = weeklyDataRepository.findByLocationName(locationName);
+//
+//        temps.add(weeklyData.get().getMinTemp().get(0));
+//        temps.add(weeklyData.get().getMaxTemp().get(0));
+//        temps.add(SkyCategory.from(weeklyData.get().getDaySky().get(0)));
+//
+//        System.out.println("postRepository = " + memberPosts.toString());
+//        System.out.println("temps = " + temps.toString());
+//
+//        String response = chatGPTService.sendRequest(temps.toString(), memberPosts.toString());
+//
+//        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
+//
+//        String content = jsonObject.getAsJsonArray("choices").get(0)
+//                .getAsJsonObject().get("message").getAsJsonObject()
+//                .get("content").getAsString();
+//
+//        List<Long> numbers = extractNumbers(content);
+//        for (Long number : numbers) {
+//            Optional<Post> post = postRepository.findById(number);
+//            posts.add(post.get());
+//        }
+//
+//        return posts.stream()
+//                .map(GetPostResponse::from)
+//                .collect(Collectors.toList());
+//    }
 
 }
