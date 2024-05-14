@@ -179,10 +179,15 @@ public class PostService {
             image3Url = saveImage(image3);
         }
 
+        float mean = (request.max() + request.min())/2;
+
+        TempCategory tempCategory = getCurrentData.returnTempCategory(mean);
+
         WeatherDataVO weatherDataVO = WeatherDataVO.builder()
                 .sky(SkyCategory.SNOW)
                 .maxTemp(request.max())
                 .minTemp(request.min())
+                .tempCategory(tempCategory)
                 .build();
 
         Post post = postRepository.save(Post.builder()
@@ -264,7 +269,7 @@ public class PostService {
                 .collect(Collectors.toList());
 
     }
-
+  
     @Transactional(readOnly = true)
     public List<GetPostResponse> getRecommendedPosts(String token, String locationName) {
 
