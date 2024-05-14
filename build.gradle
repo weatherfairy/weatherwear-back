@@ -70,6 +70,9 @@ dependencies {
     //thymeleaf
     implementation'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    // 이미지 리사이징 을 위한 라이브러리
+    implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+
 }
 
 def generated = 'src/main/generated'

@@ -77,6 +77,7 @@ public class WeatherDataService {
         List<Integer> sky3 = new ArrayList<>();
         List<Integer> sky4 = new ArrayList<>();
 
+        String currentSky = temp.get(currentHour);
         String currentTemp = temp.get(currentHour);
         String rain = data.getRain().get(currentHour);
         String wind = data.getWindSpeed().get(currentHour);
@@ -102,8 +103,8 @@ public class WeatherDataService {
         List<String> weeklyRain = weeklyData.getDayRain();
         List<Integer> weeklySky = weeklyData.getDaySky();
 
-        return new MainPageResponse(currentTemp, rain, wind, 2L,2L, temp1, sky1, temp2, sky2, temp3, sky3, temp4, sky4,
-                weeklyRain, weeklyRain, weeklySky, weeklySky, weeklyData.getMinTemp(), weeklyData.getMaxTemp());
+        return new MainPageResponse(currentSky, currentTemp, rain, wind, 2L,2L, temp1, sky1, temp2, sky2, temp3, sky3, temp4, sky4,
+                weeklyRain, weeklySky, weeklyData.getMinTemp(), weeklyData.getMaxTemp());
 
     }
 

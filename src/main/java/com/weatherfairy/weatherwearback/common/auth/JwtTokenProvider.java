@@ -45,23 +45,6 @@ public class JwtTokenProvider {
                         .compact();
     }
 
-    public String extractAccessTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken == null) {
-            throw new IllegalArgumentException();
-        }
-
-        return bearerToken;
-    }
-
-    public void validateAccessToken(String token) throws IllegalArgumentException {
-        try {
-            Jwts.parserBuilder().setSigningKey(secretKey.getBytes()).build().parseClaimsJws(token.substring(7));
-        } catch (Exception e) {
-            throw new IllegalArgumentException();
-        }
-    }
-
     public Long getMemberNoFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey.getBytes())

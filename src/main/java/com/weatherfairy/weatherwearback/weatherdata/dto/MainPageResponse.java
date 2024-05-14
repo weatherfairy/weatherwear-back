@@ -3,6 +3,7 @@ package com.weatherfairy.weatherwearback.weatherdata.dto;
 import java.util.List;
 
 public record MainPageResponse(
+        String sky,
         String temp,
         String rain,
         String wind,
@@ -17,9 +18,7 @@ public record MainPageResponse(
         List<String> temp4,
         List<Integer> sky4,
         List<String> weeklyRainDay,
-        List<String> weeklyRainNight,
         List<Integer> weeklySkyDay,
-        List<Integer> weeklySkyNight,
         List<String> minTemp,
         List<String> maxTemp
 ) {}
