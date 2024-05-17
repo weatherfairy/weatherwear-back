@@ -69,6 +69,7 @@ public class PostService {
 
     private final static int IMAGE_RESIZE_TARGET_WIDTH = 650;
 
+
     private String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf(".");
         return fileName.substring(dotIndex + 1);

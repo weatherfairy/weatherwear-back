@@ -77,7 +77,7 @@ public class WeatherDataService {
         List<Integer> sky3 = new ArrayList<>();
         List<Integer> sky4 = new ArrayList<>();
 
-        String currentSky = temp.get(currentHour);
+        Integer currentSky = sky.get(currentHour);
         String currentTemp = temp.get(currentHour);
         String rain = data.getRain().get(currentHour);
         String wind = data.getWindSpeed().get(currentHour);

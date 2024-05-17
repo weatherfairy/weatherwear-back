@@ -1,9 +1,10 @@
 package com.weatherfairy.weatherwearback.weatherdata.dto;
 
+
 import java.util.List;
 
 public record MainPageResponse(
-        String sky,
+        Integer sky,
         String temp,
         String rain,
         String wind,
