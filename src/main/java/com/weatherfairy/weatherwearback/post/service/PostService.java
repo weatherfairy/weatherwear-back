@@ -70,24 +70,24 @@ public class PostService {
 
     private final static int IMAGE_RESIZE_TARGET_WIDTH = 650;
 
-    private String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf(".");
-        return fileName.substring(dotIndex + 1);
-    }
-
-    private byte[] compressImage(MultipartFile multipartFile) throws IOException {
-
-        BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
-        BufferedImage resizedImage =
-                Scalr.resize(originalImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_TO_WIDTH, IMAGE_RESIZE_TARGET_WIDTH, Scalr.THRESHOLD_QUALITY_BALANCED);
-        String fileExtension = getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, fileExtension, outputStream);
-
-        return outputStream.toByteArray();
-    }
+//    private String getFileExtension(String fileName) {
+//        int dotIndex = fileName.lastIndexOf(".");
+//        return fileName.substring(dotIndex + 1);
+//    }
+//
+//    private byte[] compressImage(MultipartFile multipartFile) throws IOException {
+//
+//        BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
+//        BufferedImage resizedImage =
+//                Scalr.resize(originalImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_TO_WIDTH, IMAGE_RESIZE_TARGET_WIDTH, Scalr.THRESHOLD_QUALITY_BALANCED);
+//        String fileExtension = getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+//
+//
+//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//        ImageIO.write(resizedImage, fileExtension, outputStream);
+//
+//        return outputStream.toByteArray();
+//    }
 
 
 //    private InputStream compressImage(InputStream inputStream) {
@@ -133,11 +133,11 @@ public class PostService {
 
     private String saveImage(MultipartFile img) throws IOException {
 
-        byte[] compressedImage = compressImage(img);
+//        byte[] compressedImage = compressImage(img);
 
         Bucket bucket = StorageClient.getInstance().bucket(firebaseBucket);
         String name = UUID.randomUUID().toString();
-        InputStream content = new ByteArrayInputStream(compressedImage);
+        InputStream content = new ByteArrayInputStream(img.getBytes());
         Blob blob = bucket.create(name, content, img.getContentType());
 
         return storageLink + name + "?alt=media";
