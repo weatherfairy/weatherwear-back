@@ -27,7 +27,6 @@ import com.weatherfairy.weatherwearback.weatherdata.repository.WeeklyDataReposit
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
-import org.imgscalr.Scalr;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,11 +69,12 @@ public class PostService {
 
     private final static int IMAGE_RESIZE_TARGET_WIDTH = 650;
 
-//    private String getFileExtension(String fileName) {
-//        int dotIndex = fileName.lastIndexOf(".");
-//        return fileName.substring(dotIndex + 1);
-//    }
-//
+
+    private String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf(".");
+        return fileName.substring(dotIndex + 1);
+    }
+
 //    private byte[] compressImage(MultipartFile multipartFile) throws IOException {
 //
 //        BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
@@ -179,10 +179,15 @@ public class PostService {
             image3Url = saveImage(image3);
         }
 
+        float mean = (request.max() + request.min())/2;
+
+        TempCategory tempCategory = getCurrentData.returnTempCategory(mean);
+
         WeatherDataVO weatherDataVO = WeatherDataVO.builder()
-                .sky(SkyCategory.SNOW)
+                .sky(SkyCategory.from(request.sky()))
                 .maxTemp(request.max())
                 .minTemp(request.min())
+                .tempCategory(tempCategory)
                 .build();
 
         Post post = postRepository.save(Post.builder()
@@ -190,7 +195,7 @@ public class PostService {
                 .date(LocalDate.now())
                 .clothes(request.clothes())
                 .review(request.review())
-                .emoji(Emoji.HAPPY)
+                .emoji(Emoji.from(request.emoji()))
                 .weatherDataVO(weatherDataVO)
                 .image1(image1Url)
                 .image2(image2Url)
@@ -264,21 +269,21 @@ public class PostService {
                 .collect(Collectors.toList());
 
     }
-
-    @Transactional(readOnly = true)
-    public List<GetPostResponse> getRecommendedPosts(String token, String locationName) {
-
-        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
-
-        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
-        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
-
-        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
-
-        return posts.stream()
-                .map(GetPostResponse::from)
-                .collect(Collectors.toList());
-    }
+  
+//    @Transactional(readOnly = true)
+//    public List<GetPostResponse> getRecommendedPosts(String token, String locationName) {
+//
+//        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+//
+//        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
+//        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
+//
+//        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
+//
+//        return posts.stream()
+//                .map(GetPostResponse::from)
+//                .collect(Collectors.toList());
+//    }
 
 
     public static List<Long> extractNumbers(String str) {
@@ -291,40 +296,40 @@ public class PostService {
         return numbers;
     }
 
-//    @Transactional(readOnly = true)
-//    public List<GetPostResponse> getRecommendedPosts(Long memberNo, String locationName) {
-//
-//        ArrayList<Object> temps = new ArrayList<>();
-//        List<Post> posts = new ArrayList<>();
-//
-//        List<List<Object>> memberPosts = postRepository.getDataAsList(1L);
-//
-//        Optional<WeeklyData> weeklyData = weeklyDataRepository.findByLocationName(locationName);
-//
-//        temps.add(weeklyData.get().getMinTemp().get(0));
-//        temps.add(weeklyData.get().getMaxTemp().get(0));
-//        temps.add(SkyCategory.from(weeklyData.get().getDaySky().get(0)));
-//
-//        System.out.println("postRepository = " + memberPosts.toString());
-//        System.out.println("temps = " + temps.toString());
-//
-//        String response = chatGPTService.sendRequest(temps.toString(), memberPosts.toString());
-//
-//        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
-//
-//        String content = jsonObject.getAsJsonArray("choices").get(0)
-//                .getAsJsonObject().get("message").getAsJsonObject()
-//                .get("content").getAsString();
-//
-//        List<Long> numbers = extractNumbers(content);
-//        for (Long number : numbers) {
-//            Optional<Post> post = postRepository.findById(number);
-//            posts.add(post.get());
-//        }
-//
-//        return posts.stream()
-//                .map(GetPostResponse::from)
-//                .collect(Collectors.toList());
-//    }
+    @Transactional(readOnly = true)
+    public List<GetPostResponse> getRecommendedPosts(String token, String locationName) {
+
+        ArrayList<Object> temps = new ArrayList<>();
+        List<Post> posts = new ArrayList<>();
+
+        List<List<Object>> memberPosts = postRepository.getDataAsList(1L);
+
+        Optional<WeeklyData> weeklyData = weeklyDataRepository.findByLocationName(locationName);
+
+        temps.add(weeklyData.get().getMinTemp().get(0));
+        temps.add(weeklyData.get().getMaxTemp().get(0));
+        temps.add(SkyCategory.from(weeklyData.get().getDaySky().get(0)));
+
+        System.out.println("postRepository = " + memberPosts.toString());
+        System.out.println("temps = " + temps.toString());
+
+        String response = chatGPTService.sendRequest(temps.toString(), memberPosts.toString());
+
+        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
+
+        String content = jsonObject.getAsJsonArray("choices").get(0)
+                .getAsJsonObject().get("message").getAsJsonObject()
+                .get("content").getAsString();
+
+        List<Long> numbers = extractNumbers(content);
+        for (Long number : numbers) {
+            Optional<Post> post = postRepository.findById(number);
+            posts.add(post.get());
+        }
+
+        return posts.stream()
+                .map(GetPostResponse::from)
+                .collect(Collectors.toList());
+    }
 
 }
