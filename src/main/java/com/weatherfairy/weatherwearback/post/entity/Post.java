@@ -1,6 +1,8 @@
 package com.weatherfairy.weatherwearback.post.entity;
 
 import com.weatherfairy.weatherwearback.common.enums.Emoji;
+import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
+import com.weatherfairy.weatherwearback.post.dto.request.UpdatePostRequest;
 import com.weatherfairy.weatherwearback.post.entity.vo.WeatherDataVO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -48,6 +50,15 @@ public class Post implements Serializable {
 
     @Embedded
     private WeatherDataVO weatherDataVO;
+
+    public void update(UpdatePostRequest request, String url1, String url2, String url3) {
+        this.clothes =  request.clothes();
+        this.review = request.review();
+        this.emoji = Emoji.from(request.emoji());
+        this.image1 = url1;
+        this.image2 = url2;
+        this.image3 = url3;
+    }
 
     @Builder
     public Post(Long memberNo, LocalDate date, String image1, String image2, String image3, String clothes, String review, Emoji emoji, WeatherDataVO weatherDataVO) {

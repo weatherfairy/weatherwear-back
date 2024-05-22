@@ -2,9 +2,11 @@ package com.weatherfairy.weatherwearback.post.controller;
 
 import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
 import com.weatherfairy.weatherwearback.post.dto.request.PostFilterCriteria;
+import com.weatherfairy.weatherwearback.post.dto.request.UpdatePostRequest;
 import com.weatherfairy.weatherwearback.post.dto.response.CreatePostResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostsResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostResponse;
+import com.weatherfairy.weatherwearback.post.dto.response.UpdatePostResponse;
 import com.weatherfairy.weatherwearback.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -73,6 +75,27 @@ public class PostController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @PutMapping("/api/v1/closet/{postNo}")
+    public ResponseEntity<UpdatePostResponse> updatePost(
+            @PathVariable Long postNo,
+            @RequestHeader("Authorization")String token,
+            @RequestPart(value = "image1", required = false) MultipartFile image1,
+            @RequestPart(value = "image2", required = false) MultipartFile image2,
+            @RequestPart(value = "image3", required = false) MultipartFile image3,
+            @RequestPart("clothes") String clothesText,
+            @RequestPart("review") String review,
+            @RequestPart("emoji") String emoji
+    ) throws IOException {
+
+        UpdatePostRequest request = new UpdatePostRequest(clothesText, review, Integer.parseInt(emoji));
+
+        UpdatePostResponse response = postService.updatePost(postNo, token, image1,image2,image3, request);
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @DeleteMapping("/api/v1/closet/{postNo}")
     public ResponseEntity<String> deletePost(@RequestHeader("Authorization")String token,

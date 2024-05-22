@@ -81,8 +81,11 @@ public class WeatherDataService {
         String currentTemp = temp.get(currentHour);
         String rain = data.getRain().get(currentHour);
         String wind = data.getWindSpeed().get(currentHour);
-//        Long top = clothesRecommendService.recommendClothesByCategories(currentTemp).get(0);
-//        Long bottom = clothesRecommendService.recommendClothesByCategories(currentTemp).get(1);
+
+        List<Integer> clothesRandom = clothesRecommendService.recommendClothesByCategories(currentTemp);
+
+        Integer top = clothesRandom.get(0);
+        Integer bottom = clothesRandom.get(1);
 
 
         for (int i = 3 ; i <= 24 ; i += 3) {
@@ -103,7 +106,7 @@ public class WeatherDataService {
         List<String> weeklyRain = weeklyData.getDayRain();
         List<Integer> weeklySky = weeklyData.getDaySky();
 
-        return new MainPageResponse(currentSky, currentTemp, rain, wind, 2L,2L, temp1, sky1, temp2, sky2, temp3, sky3, temp4, sky4,
+        return new MainPageResponse(currentSky, currentTemp, rain, wind, top,bottom, temp1, sky1, temp2, sky2, temp3, sky3, temp4, sky4,
                 weeklyRain, weeklySky, weeklyData.getMinTemp(), weeklyData.getMaxTemp());
 
     }

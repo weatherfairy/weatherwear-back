@@ -15,9 +15,11 @@ import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
 import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.post.dto.request.CreatePostRequest;
 import com.weatherfairy.weatherwearback.post.dto.request.PostFilterCriteria;
+import com.weatherfairy.weatherwearback.post.dto.request.UpdatePostRequest;
 import com.weatherfairy.weatherwearback.post.dto.response.CreatePostResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostsResponse;
 import com.weatherfairy.weatherwearback.post.dto.response.GetPostResponse;
+import com.weatherfairy.weatherwearback.post.dto.response.UpdatePostResponse;
 import com.weatherfairy.weatherwearback.post.entity.Post;
 import com.weatherfairy.weatherwearback.post.entity.QPost;
 import com.weatherfairy.weatherwearback.post.entity.vo.WeatherDataVO;
@@ -42,6 +44,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -220,17 +223,6 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetPostsResponse> getAllPosts(Long memberNo) {
-
-        List<Post> postsList = postRepository.findAllByMemberNo(memberNo);
-
-        return postsList.stream()
-                .map(GetPostsResponse::from)
-                .collect(Collectors.toList());
-
-    }
-
-    @Transactional(readOnly = true)
     public List<GetPostsResponse> getPostsByFilter(String token, PostFilterCriteria criteria) {
 
         Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
@@ -270,20 +262,20 @@ public class PostService {
 
     }
   
-//    @Transactional(readOnly = true)
-//    public List<GetPostResponse> getRecommendedPosts(String token, String locationName) {
-//
-//        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
-//
-//        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
-//        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
-//
-//        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
-//
-//        return posts.stream()
-//                .map(GetPostResponse::from)
-//                .collect(Collectors.toList());
-//    }
+    @Transactional(readOnly = true)
+    public List<GetPostResponse> getRecommendedPosts(String token, String locationName) {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
+        TempCategory tempCategory = getCurrentData.returnCurrentTempCategory(locationName);
+        int skyCategory = getCurrentData.returnCurrentSkyCategory(locationName);
+
+        List<Post> posts = postRepository.findRecentPostsBySkyAndTempCategory(memberNo, SkyCategory.from(skyCategory), tempCategory);
+
+        return posts.stream()
+                .map(GetPostResponse::from)
+                .collect(Collectors.toList());
+    }
 
 
     public static List<Long> extractNumbers(String str) {
@@ -297,34 +289,38 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetPostResponse> getRecommendedPosts(String token, String locationName) {
+    public List<GetPostResponse> getRecommendedPostsByGPT(String token, String locationName) {
 
         ArrayList<Object> temps = new ArrayList<>();
         List<Post> posts = new ArrayList<>();
 
-        List<List<Object>> memberPosts = postRepository.getDataAsList(1L);
+        try {
+            List<List<Object>> memberPosts = postRepository.getDataAsList(1L);
 
-        Optional<WeeklyData> weeklyData = weeklyDataRepository.findByLocationName(locationName);
+            Optional<WeeklyData> weeklyData = weeklyDataRepository.findByLocationName(locationName);
 
-        temps.add(weeklyData.get().getMinTemp().get(0));
-        temps.add(weeklyData.get().getMaxTemp().get(0));
-        temps.add(SkyCategory.from(weeklyData.get().getDaySky().get(0)));
+            temps.add(weeklyData.get().getMinTemp().get(0));
+            temps.add(weeklyData.get().getMaxTemp().get(0));
+            temps.add(SkyCategory.from(weeklyData.get().getDaySky().get(0)));
 
-        System.out.println("postRepository = " + memberPosts.toString());
-        System.out.println("temps = " + temps.toString());
+            String response = chatGPTService.sendRequest(temps.toString(), memberPosts.toString());
 
-        String response = chatGPTService.sendRequest(temps.toString(), memberPosts.toString());
+            JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
 
-        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
+            String content = jsonObject.getAsJsonArray("choices").get(0)
+                    .getAsJsonObject().get("message").getAsJsonObject()
+                    .get("content").getAsString();
 
-        String content = jsonObject.getAsJsonArray("choices").get(0)
-                .getAsJsonObject().get("message").getAsJsonObject()
-                .get("content").getAsString();
-
-        List<Long> numbers = extractNumbers(content);
-        for (Long number : numbers) {
-            Optional<Post> post = postRepository.findById(number);
-            posts.add(post.get());
+            List<Long> numbers = extractNumbers(content);
+            for (Long number : numbers) {
+                Optional<Post> post = postRepository.findById(number);
+                if (post.isPresent()) {
+                    posts.add(post.get());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            return getRecommendedPosts(token, locationName);
         }
 
         return posts.stream()
@@ -332,4 +328,39 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional
+    public UpdatePostResponse updatePost(Long postNo, String token, MultipartFile image1, MultipartFile image2, MultipartFile image3, UpdatePostRequest request) throws IOException {
+
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+        Post post = postRepository.findById(postNo)
+                        .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+
+        isWriter(memberNo, post.getMemberNo());
+
+        String image1Url = null;
+        String image2Url = null;
+        String image3Url = null;
+
+        if (image1 != null) {
+            image1Url = saveImage(image1);
+        }
+        if (image2 != null) {
+            image2Url = saveImage(image2);
+        }
+        if (image3 != null) {
+            image3Url = saveImage(image3);
+        }
+
+        post.update(request, image1Url, image2Url, image3Url);
+
+        return UpdatePostResponse.from(post);
+
+    }
+
+    private void isWriter(Long memberNo, Long postWriterNo) {
+        if (!postWriterNo.equals(memberNo)) {
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+    }
 }

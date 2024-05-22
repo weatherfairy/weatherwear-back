@@ -5,6 +5,7 @@ import com.weatherfairy.weatherwearback.common.current.GetCurrentData;
 import com.weatherfairy.weatherwearback.common.enums.ClothesCategory;
 import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.clothes.repository.ClothesRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,24 +22,25 @@ public class ClothesRecommendService {
     private final ClothesRepository clothesRepository;
     private final GetCurrentData getCurrentData;
 
-    public List<Long> recommendClothesByCategories(String temp) {
+    public List<Integer> recommendClothesByCategories(String temp) {
 
         TempCategory tempCategory = getCurrentData.returnTempCategory(temp);
 
-        List<Long> recommendedClothesIds = new ArrayList<>();
+        List<Integer> recommendedClothesNos = new ArrayList<>();
 
-        recommendedClothesIds.add(getRandomClothes(ClothesCategory.TOP, tempCategory).getClothesId());
-        recommendedClothesIds.add(getRandomClothes(ClothesCategory.BOTTOM, tempCategory).getClothesId());
+        recommendedClothesNos.add(getRandomClothes(ClothesCategory.TOP, tempCategory).getClothesNo());
+        recommendedClothesNos.add(getRandomClothes(ClothesCategory.BOTTOM, tempCategory).getClothesNo());
 
-        return recommendedClothesIds;
+        return recommendedClothesNos;
     }
 
     private Clothes getRandomClothes(ClothesCategory clothesCategory, TempCategory tempCategory) {
         List<Clothes> clothesList = clothesRepository.findAllByClothesCategoryAndTempCategory(clothesCategory, tempCategory);
 
-
         Random random = new Random();
-        return clothesList.get(0);
+        int index = random.nextInt(clothesList.size());
+
+        return clothesList.get(index);
     }
 }
 

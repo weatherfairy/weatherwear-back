@@ -37,10 +37,10 @@ public class ParseWeatherData {
             tmpValues.add( main.get("temp").toString());
 
 
-            if (weatherID.equals("800")) {
-                skyValues.add(8);
-            } else if (weatherID.startsWith("8")) {
+            if (weatherID.equals("803")||weatherID.equals("804")) {
                 skyValues.add(7);
+            } else if (weatherID.startsWith("8")) {
+                skyValues.add(8);
             } else {
                 skyValues.add(Integer.parseInt(weatherID.substring(0,1)));
             }

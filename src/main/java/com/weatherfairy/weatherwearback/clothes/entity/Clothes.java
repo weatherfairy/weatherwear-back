@@ -21,6 +21,10 @@ public class Clothes {
     private Long clothesId;
 
     @Column
+    @Comment("고유 식별 번호")
+    private int clothesNo;
+
+    @Column
     @Comment("상의, 하의, 여성하의")
     private ClothesCategory clothesCategory;
 
@@ -29,17 +33,12 @@ public class Clothes {
     private TempCategory tempCategory;
 
     @Column
-    @Comment("맑음, 흐림, 비, 눈, 비_눈, 바람, 구름많음")
-    private SkyCategory skyCategory;
-
-    @Column
     private String clothesName;
 
     @Builder
-    public Clothes(ClothesCategory clothesCategory, TempCategory tempCategory, SkyCategory skyCategory, String clothesName) {
+    public Clothes(ClothesCategory clothesCategory, TempCategory tempCategory, String clothesName) {
         this.clothesCategory = clothesCategory;
         this.tempCategory = tempCategory;
-        this.skyCategory = skyCategory;
         this.clothesName = clothesName;
     }
 }
