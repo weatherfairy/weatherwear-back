@@ -28,24 +28,17 @@ public class Scheduler {
     private final WeeklyDataRepository weeklyDataRepository;
 
 
-//    @Scheduled(cron = "0 30 23 * * *")
+    //@Scheduled(cron = "0 30 23 * * *")
     public void saveYesterdayData() {
+        yesterdayRepository.deleteAllInBatch();
         weatherDataService.getYesterdayFromToday();
     }
 
 
-//    @Scheduled(cron = "0 40 23 * * *")
-    public void getDailyWeather() throws ParseException, IOException {
+    //@Scheduled(cron = "0 42 20 * * *")
+    public void getDailyWeather() {
 
         dailyDataRepository.deleteAllInBatch();
-
-
-//        JSONArray weatherData = weatherAPIService.getDailyWeather(
-//                "37.56",
-//                "127"
-//
-//        );
-//        parseWeatherData.saveDailyData("서울특별시중구",weatherData);
 
         List<Location> locations = locationRepository.findAll();
         locations.forEach(location -> {
@@ -61,18 +54,10 @@ public class Scheduler {
         });
     }
 
-//    @Scheduled(cron = "0 50 23 * * *")
-    public void getWeeklyWeather() throws ParseException, IOException {
+    //@Scheduled(cron = "0 50 23 * * *")
+    public void getWeeklyWeather() {
 
         weeklyDataRepository.deleteAllInBatch();
-
-//
-//        JSONArray weatherData = weatherAPIService.getWeeklyWeather(
-//                   "37.56",
-//                 "127"
-//
-//        );
-//        parseWeatherData.saveWeeklyData("서울특별시중구",weatherData);
 
         List<Location> locations = locationRepository.findAll();
         locations.forEach(location -> {
