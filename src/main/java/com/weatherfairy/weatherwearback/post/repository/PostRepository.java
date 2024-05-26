@@ -3,8 +3,6 @@ package com.weatherfairy.weatherwearback.post.repository;
 import com.weatherfairy.weatherwearback.common.enums.SkyCategory;
 import com.weatherfairy.weatherwearback.common.enums.TempCategory;
 import com.weatherfairy.weatherwearback.post.entity.Post;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,7 +23,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                                                    @Param("tempCategory") TempCategory tempCategory);
 
 
-    @Query("SELECT NEW list(p.weatherDataVO.minTemp, p.weatherDataVO.maxTemp, p.weatherDataVO.sky) FROM Post p WHERE p.memberNo = :memberNo")
+    @Query("SELECT NEW list(p.weatherDataVO.minTemp, p.weatherDataVO.maxTemp, p.weatherDataVO.sky) FROM Post p WHERE p.memberNo = :memberNo AND p.review = 'HAPPY'")
     List<List<Object>> getDataAsList(@Param("memberNo") Long memberNo);
 
 }
