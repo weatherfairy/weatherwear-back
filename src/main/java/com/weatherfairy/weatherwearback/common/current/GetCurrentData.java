@@ -57,13 +57,13 @@ public class GetCurrentData {
         } else if (currentTemp <= 8) {
             return TempCategory.WINTER2;
         } else if (currentTemp <= 11) {
-            return TempCategory.SPRING1;
-        } else if (currentTemp <= 16) {
-            return TempCategory.SPRING2;
-        } else if (currentTemp <= 19) {
             return TempCategory.AUTUMN1;
-        } else if (currentTemp <= 22) {
+        } else if (currentTemp <= 16) {
             return TempCategory.AUTUMN2;
+        } else if (currentTemp <= 19) {
+            return TempCategory.SPRING1;
+        } else if (currentTemp <= 22) {
+            return TempCategory.SPRING2;
         } else if (currentTemp <= 27) {
             return TempCategory.SUMMER1;
         } else {
