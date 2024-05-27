@@ -48,9 +48,6 @@ public class ChatGPTService {
         HttpStatusCode statusCode = response.getStatusCode();
         String responseBody = response.getBody();
 
-        System.out.println("Status Code: " + statusCode);
-        System.out.println("Response Body: " + responseBody);
-
         return responseBody;
     }
 }
