@@ -17,13 +17,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE p.weatherDataVO.sky = :skyCategory " +
             "AND p.weatherDataVO.tempCategory = :tempCategory " +
             "AND p.memberNo = :memberNo " +
+            "AND p.review = 'HAPPY' " +
             "ORDER BY p.date DESC LIMIT 3")
     List<Post> findRecentPostsBySkyAndTempCategory(@Param("memberNo") Long memberNo,
                                                    @Param("skyCategory") SkyCategory skyCategory,
                                                    @Param("tempCategory") TempCategory tempCategory);
 
 
-    @Query("SELECT NEW list(p.weatherDataVO.minTemp, p.weatherDataVO.maxTemp, p.weatherDataVO.sky) FROM Post p WHERE p.memberNo = :memberNo AND p.review = 'HAPPY'")
+    @Query("SELECT NEW list(p.postId, p.weatherDataVO.minTemp, p.weatherDataVO.maxTemp, p.weatherDataVO.sky) FROM Post p WHERE p.memberNo = :memberNo AND p.emoji = 0")
     List<List<Object>> getDataAsList(@Param("memberNo") Long memberNo);
 
 }

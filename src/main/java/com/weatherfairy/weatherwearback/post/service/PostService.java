@@ -254,6 +254,7 @@ public class PostService {
 
         List<Post> posts = jpaQueryFactory.selectFrom(post)
                 .where(whereClause)
+                .orderBy(post.postId.desc())
                 .fetch();
 
         return posts.stream()
@@ -291,11 +292,14 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<GetPostResponse> getRecommendedPostsByGPT(String token, String locationName) {
 
+        Long memberNo = jwtTokenProvider.getMemberNoFromToken(token);
+
         ArrayList<Object> temps = new ArrayList<>();
         List<Post> posts = new ArrayList<>();
 
         try {
-            List<List<Object>> memberPosts = postRepository.getDataAsList(1L);
+            List<List<Object>> memberPosts = postRepository.getDataAsList(memberNo);
+
 
             Optional<WeeklyData> weeklyData = weeklyDataRepository.findByLocationName(locationName);
 
@@ -316,6 +320,7 @@ public class PostService {
                 Optional<Post> post = postRepository.findById(number);
                 if (post.isPresent()) {
                     posts.add(post.get());
+                    System.out.println("post = " + post);
                 }
             }
         } catch (Exception e) {

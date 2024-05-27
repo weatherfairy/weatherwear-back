@@ -49,7 +49,7 @@ public class PostController {
     @GetMapping("/api/v1/closet/recommend")
     public ResponseEntity<List<GetPostResponse>> getRecommendedPosts(@RequestHeader("Authorization")String token,
                                                                      @RequestParam("location") String locationName) {
-        List<GetPostResponse> recommendedPosts = postService.getRecommendedPosts(token, locationName);
+        List<GetPostResponse> recommendedPosts = postService.getRecommendedPostsByGPT(token, locationName);
 
         return ResponseEntity.ok(recommendedPosts);
     }
