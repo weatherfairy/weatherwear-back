@@ -254,6 +254,7 @@ public class PostService {
 
         List<Post> posts = jpaQueryFactory.selectFrom(post)
                 .where(whereClause)
+                .orderBy(post.postId.desc())
                 .fetch();
 
         return posts.stream()
