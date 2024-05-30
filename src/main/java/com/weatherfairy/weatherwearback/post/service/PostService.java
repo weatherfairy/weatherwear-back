@@ -320,7 +320,9 @@ public class PostService {
                 Optional<Post> post = postRepository.findById(number);
                 if (post.isPresent()) {
                     posts.add(post.get());
-                    System.out.println("post = " + post);
+                }
+                if(post.isEmpty()) {
+                    throw new Exception();
                 }
             }
         } catch (Exception e) {

@@ -28,7 +28,6 @@ public class WeatherDataService {
     private final ClothesRecommendService clothesRecommendService;
     private final WeeklyDataRepository weeklyDataRepository;
 
-    int currentHour = LocalTime.now().getHour();
 
     @Transactional
     public void getYesterdayFromToday() {
@@ -52,6 +51,8 @@ public class WeatherDataService {
 
     @Transactional(readOnly = true)
     public MainPageResponse getMainPageData(String locationName) {
+
+        int currentHour = LocalTime.now().getHour();
 
         DailyData data = dailyDataRepository.findByLocationName(locationName)
                 .orElseThrow(() -> new EntityNotFoundException("해당 지역이 존재하지 않습니다."));
